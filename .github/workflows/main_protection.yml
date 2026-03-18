@@ -9,11 +9,13 @@ jobs:
   check-source-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail unless source branch is development
+      - name: Show refs
         run: |
           echo "Base branch: ${{ github.base_ref }}"
           echo "Head branch: ${{ github.head_ref }}"
-          if [ "${{ github.head_ref }}" != "development" ]; then
-            echo "Only pull requests from 'development' into 'main' are allowed."
-            exit 1
-          fi
+
+      - name: Fail if source is not development
+        if: ${{ github.head_ref != 'development' }}
+        run: |
+          echo "Only pull requests from 'development' into 'main' are allowed."
+          exit 1
