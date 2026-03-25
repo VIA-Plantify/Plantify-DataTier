@@ -26,7 +26,7 @@ public class UserRepository : IUserRepository
     {
         throw new NotImplementedException();
     }
-    public Task<IEnumerable<User>> GetManyAsync()
+    public IQueryable<User> GetMany()
     {
         throw new NotImplementedException();
     }

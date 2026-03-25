@@ -1,6 +1,7 @@
 using Entities;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace GrpcService.Services;
@@ -90,8 +91,8 @@ public class UserService : UserServiceProto.UserServiceProtoBase
 
     public override async Task<GetManyUserResponse> GetAll(Empty request, ServerCallContext context)
     {
-        // No need for rpc handling, "no users" are naturally handled on the bussiness tier
-        var users = await _repository.GetManyAsync();
+        // No need for rpc handling, "no users" are naturally handled on the business tier
+        var users = await _repository.GetMany().ToListAsync();
 
         var response = new GetManyUserResponse();
 
