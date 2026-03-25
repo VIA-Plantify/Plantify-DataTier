@@ -5,7 +5,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
     container_name: datadev
     volumes:
-      - .:/workspace:cached
+      - .:/workspace
     working_dir: /workspace
     command: sleep infinity
     user: root
