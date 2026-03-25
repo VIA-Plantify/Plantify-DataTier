@@ -1,0 +1,15 @@
+{
+  "name": "C# Data Dev",
+  "dockerComposeFile": "../docker-compose-data.yml",
+  "service": "datadev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "none",
+  "updateRemoteUserUID": false,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit"
+      ]
+    }
+  }
+}

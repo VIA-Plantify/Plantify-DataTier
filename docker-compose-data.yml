@@ -1,0 +1,43 @@
+services:
+  datadev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: datadev
+    volumes:
+      - .:/workspace:cached
+    working_dir: /workspace
+    command: sleep infinity
+    user: root
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: task-postgres
+    environment:
+      POSTGRES_DB: plantify
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: plantifydev
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d plantify"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    name: app-network
+    external: true
