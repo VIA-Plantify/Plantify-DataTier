@@ -5,29 +5,48 @@ namespace EFC.Repositories;
 
 public class UserRepository : IUserRepository
 {
+    private List<User> users;
 
-    public Task<User> CreateAsync(User user)
+    public async Task<User> CreateAsync(User user)
     {
-        throw new NotImplementedException();
+        users.Add(user);
+        return await Task.FromResult(user);
     }
-    public Task<User> GetByEmailAsync(string email)
+    public async Task<User> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        var user = users.FirstOrDefault(u => u.Email == email);
+        if (user == null)
+            throw new InvalidOperationException($"User with email {user?.Email} not found.");
+        return await Task.FromResult(user);
     }
-    public Task<User> GetByUsernameAsync(string username)
+    public async Task<User> GetByUsernameAsync(string username)
     {
-        throw new NotImplementedException();
+        var user = users.FirstOrDefault(u => u.Username == username);
+        if (user == null)
+            throw new InvalidOperationException($"User with username {user?.Username} not found.");
+        return await Task.FromResult(user);
     }
-    public Task DeleteAsync(string username)
+    public async Task DeleteAsync(string username)
     {
-        throw new NotImplementedException();
+        var user = users.FirstOrDefault(u => u.Username == username);
+        if (user != null)
+        {
+            users.Remove(user);
+        }
+        await Task.CompletedTask;
     }
-    public Task UpdateAsync(User user)
+    public async Task UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        var existingUser = users.FirstOrDefault(u => u.Username == user.Username);
+        if (existingUser != null)
+        {
+            var index = users.IndexOf(existingUser);
+            users[index] = user;
+        }
+        await Task.CompletedTask;
     }
     public IQueryable<User> GetMany()
     {
-        throw new NotImplementedException();
+        return users.AsQueryable();
     }
 }
