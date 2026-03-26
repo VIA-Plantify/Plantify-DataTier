@@ -8,18 +8,15 @@ namespace GrpcService.Services;
 
 public class UserService : UserServiceProto.UserServiceProtoBase
 {
-    private readonly ILogger<UserService> _logger;
     private readonly IUserRepository _repository;
 
-    public UserService(ILogger<UserService> logger, IUserRepository repository)
+    public UserService(IUserRepository repository)
     {
-        _logger = logger;
         _repository = repository;
     }
 
     public override async Task<UserResponse> Create(CreateUserRequest request, ServerCallContext context)
     {
-        // No need for rpc handling because we are doing it through get ig
         var user = new User
         {
             Name = request.Name,
@@ -28,9 +25,16 @@ public class UserService : UserServiceProto.UserServiceProtoBase
             Email = request.Email
         };
 
-        var created = await _repository.CreateAsync(user);
-
-        return MapToResponse(created);
+        try
+        {
+            var created = await _repository.CreateAsync(user);
+            return await Task.FromResult(MapToResponse(created));
+        }
+        catch (InvalidOperationException ex)
+        {
+            // User already exists
+            throw new RpcException(new Status(StatusCode.AlreadyExists, ex.Message));
+        }
     }
 
     public override async Task<Empty> Delete(DeleteUserRequest request, ServerCallContext context)
@@ -42,7 +46,7 @@ public class UserService : UserServiceProto.UserServiceProtoBase
         }
         catch (InvalidOperationException ex)
         {
-            // In case we are trying to delete a user that doesn't exist
+            // User not found
             throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
         }
     }
@@ -58,11 +62,11 @@ public class UserService : UserServiceProto.UserServiceProtoBase
             else
                 user = await _repository.GetByEmailAsync(request.Email);
 
-            return MapToResponse(user);
+            return await Task.FromResult(MapToResponse(user));
         }
         catch (InvalidOperationException ex)
         {
-            // Rpc exeption that can be hanled on the bussiness tier
+            // User not found
             throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
         }
     }
@@ -84,24 +88,30 @@ public class UserService : UserServiceProto.UserServiceProtoBase
         }
         catch (InvalidOperationException ex)
         {
-            // User not found or cannot update (but our bussiness tier doesn't have rpc handling for update)
+            // User not found
             throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
         }
     }
 
     public override async Task<GetManyUserResponse> GetAll(Empty request, ServerCallContext context)
     {
-        // No need for rpc handling, "no users" are naturally handled on the business tier
-        var users = await _repository.GetMany().ToListAsync();
-
-        var response = new GetManyUserResponse();
-
-        foreach (var user in users)
+        try
         {
-            response.Users.Add(MapToResponse(user));
+            var users = await _repository.GetMany().ToListAsync();
+            
+            var response = new GetManyUserResponse();
+            foreach (var user in users)
+            {
+                response.Users.Add(MapToResponse(user));
+            }
+            
+            return response;
         }
-
-        return response;
+        catch (Exception ex)
+        {
+            // Handles database failure
+            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+        }
     }
     
     private UserResponse MapToResponse(User user)
@@ -115,3 +125,6 @@ public class UserService : UserServiceProto.UserServiceProtoBase
         };
     }
 }
+
+
+
