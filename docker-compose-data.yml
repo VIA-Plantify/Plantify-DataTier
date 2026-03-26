@@ -16,12 +16,13 @@ services:
       - backend
   grpcserver:
     image: grpcserver
+    container_name: grpcserver
     build:
       context: .
       dockerfile: ./GrpcService/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://0.0.0.0:10081
+      ASPNETCORE_URLS: http://0.0.0.0:10081
     user: root
     depends_on:
       postgres:
