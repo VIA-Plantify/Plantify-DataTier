@@ -6,14 +6,18 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMPOSE_FILE="${PROJECT_ROOT}/docker-compose-data.yml"
 PROJECT_NAME="plantify-datatier"
 SERVICE="grpcserver"
+CONTAINER_NAME="grpcserver"
 
 cd "${PROJECT_ROOT}"
 
 echo "Stopping ${SERVICE}..."
 docker compose -p "${PROJECT_NAME}" -f "${COMPOSE_FILE}" stop "${SERVICE}" || true
 
-echo "Removing old ${SERVICE} container..."
+echo "Removing old ${SERVICE} container from compose..."
 docker compose -p "${PROJECT_NAME}" -f "${COMPOSE_FILE}" rm -f "${SERVICE}" || true
+
+echo "Removing any existing Docker container named ${CONTAINER_NAME}..."
+docker rm -f "${CONTAINER_NAME}" || true
 
 echo "Rebuilding and starting fresh ${SERVICE}..."
 docker compose -p "${PROJECT_NAME}" -f "${COMPOSE_FILE}" up --build --force-recreate -d --no-deps "${SERVICE}"
