@@ -29,7 +29,7 @@ services:
     ports:
       - "10081:10081"
     networks:
-      app-network:
+      plantify-backend:
         aliases:
           - grpcserver
   postgres:
