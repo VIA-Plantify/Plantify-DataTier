@@ -13,7 +13,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - app-network
+      - plantify-backend
   grpcserver:
     build:
       context: .
@@ -45,7 +45,7 @@ services:
     ports:
       - "55432:5432"
     networks:
-      - app-network
+      - plantify-backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dev -d plantify"]
       interval: 10s
