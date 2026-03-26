@@ -60,4 +60,3 @@ networks:
   backend:
     name: plantify-backend
     driver: bridge
-    internal: true
