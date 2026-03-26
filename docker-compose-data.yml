@@ -14,7 +14,24 @@ services:
         condition: service_healthy
     networks:
       - app-network
-
+  grpcserver:
+    build:
+      context: .
+      dockerfile: ./GrpcService/Dockerfile
+    container_name: grpcserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:10081
+    user: root
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "10081:10081"
+    networks:
+      app-network:
+        aliases:
+          - grpcserver
   postgres:
     image: postgres:17-alpine
     container_name: task-postgres
@@ -25,6 +42,8 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "55432:5432"
     networks:
       - app-network
     healthcheck:
@@ -38,6 +57,7 @@ volumes:
   postgres_data:
 
 networks:
-  app-network:
-    name: app-network
-    external: true
+  backend:
+    name: plantify-backend
+    driver: bridge
+    internal: true
