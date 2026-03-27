@@ -1,5 +1,7 @@
+using EFC.DataAccess;
 using EFC.Repositories;
 using GrpcService.Services;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddDbContext<PlantifyContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
