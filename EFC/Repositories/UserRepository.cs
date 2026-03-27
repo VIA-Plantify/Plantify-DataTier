@@ -1,52 +1,55 @@
+using EFC.DataAccess;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace EFC.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private List<User> users;
+    private readonly PlantifyContext context;
+
+    public UserRepository(PlantifyContext context)
+    {
+        this.context = context;
+    }
 
     public async Task<User> CreateAsync(User user)
     {
-        users.Add(user);
-        return await Task.FromResult(user);
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+        return user;
     }
     public async Task<User> GetByEmailAsync(string email)
     {
-        var user = users.FirstOrDefault(u => u.Email == email);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null)
-            throw new InvalidOperationException($"User with email {user?.Email} not found.");
-        return await Task.FromResult(user);
+            throw new InvalidOperationException($"User with email '{email}' not found.");
+        return user;
     }
     public async Task<User> GetByUsernameAsync(string username)
     {
-        var user = users.FirstOrDefault(u => u.Username == username);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null)
-            throw new InvalidOperationException($"User with username {user?.Username} not found.");
-        return await Task.FromResult(user);
+            throw new InvalidOperationException($"User with username '{username}' not found.");
+        return user;
     }
     public async Task DeleteAsync(string username)
     {
-        var user = users.FirstOrDefault(u => u.Username == username);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user != null)
         {
-            users.Remove(user);
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
         }
-        await Task.CompletedTask;
     }
     public async Task UpdateAsync(User user)
     {
-        var existingUser = users.FirstOrDefault(u => u.Username == user.Username);
-        if (existingUser != null)
-        {
-            var index = users.IndexOf(existingUser);
-            users[index] = user;
-        }
-        await Task.CompletedTask;
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
     }
     public IQueryable<User> GetMany()
     {
-        return users.AsQueryable();
+        return context.Users.AsQueryable();
     }
 }
