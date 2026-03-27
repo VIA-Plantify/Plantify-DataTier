@@ -16,6 +16,9 @@ public class UserRepository : IUserRepository
 
     public async Task<User> CreateAsync(User user)
     {
+        var existing = context.Users.FirstOrDefault(u => u.Username == user.Username);
+        if (existing != null)
+            throw new InvalidOperationException($"User with username {user.Username} already exists.");
         context.Users.Add(user);
         await context.SaveChangesAsync();
         return user;

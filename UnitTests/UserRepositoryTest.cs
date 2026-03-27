@@ -1,57 +1,33 @@
 using Entities;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
-using EFC.Repositories;         
-using EFC.DataAccess; 
+using EFC.Repositories;
+using EFC.DataAccess;
 
 namespace UnitTests
 {
     [TestFixture]
     public class UserRepositoryEfcTests
     {
-        private Mock<PlantifyContext> _contextMock;
-        private Mock<DbSet<User>> _dbSetMock;
+        private PlantifyContext _context;
         private UserRepository _repository;
 
         [SetUp]
         public void Setup()
         {
-            var users = new List<User>();
+            var options = new DbContextOptionsBuilder<PlantifyContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
 
-            _dbSetMock = CreateDbSetMock(Enumerable.Empty<User>().AsQueryable());
-            _contextMock = new Mock<PlantifyContext>(new DbContextOptionsBuilder<PlantifyContext>()
-                .UseInMemoryDatabase("test")
-                .Options);
-            _contextMock.Setup(c => c.Users).Returns(_dbSetMock.Object);
-            _contextMock.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
-
-            _repository = new UserRepository(_contextMock.Object);
+            _context = new PlantifyContext(options);
+            _repository = new UserRepository(_context);
         }
 
-        // ── helpers ──────────────────────────────────────────────────────────
-
-        private static Mock<DbSet<T>> CreateDbSetMock<T>(IQueryable<T> data)
-            where T : class
+        [TearDown]
+        public void TearDown()
         {
-            var enumerator = data.GetEnumerator();
-            var mock = new Mock<DbSet<T>>();
-            mock.As<IQueryable<T>>().Setup(m => m.Provider).Returns(data.Provider);
-            mock.As<IQueryable<T>>().Setup(m => m.Expression).Returns(data.Expression);
-            mock.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mock.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(enumerator);
-            mock.As<IAsyncEnumerable<T>>()
-                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-                .Returns(new TestAsyncEnumerator<T>(enumerator));
-            return mock;
-        }
-
-        private Mock<DbSet<User>> SetupUsersDbSet(IEnumerable<User> seed)
-        {
-            var queryable = seed.AsQueryable();
-            var mock = CreateDbSetMock(queryable);
-            _contextMock.Setup(c => c.Users).Returns(mock.Object);
-            return mock;
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
         }
 
         // ── CreateAsync ───────────────────────────────────────────────────────
@@ -72,19 +48,16 @@ namespace UnitTests
             var result = await _repository.CreateAsync(user);
 
             // Assert
-            _dbSetMock.Verify(d => d.Add(It.Is<User>(u =>
-                u.Username == user.Username &&
-                u.Email == user.Email)), Times.Once);
-
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Once);
-
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Username, Is.EqualTo(user.Username));
             Assert.That(result.Email, Is.EqualTo(user.Email));
+
+            var inDb = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+            Assert.That(inDb, Is.Not.Null);
         }
 
         [Test]
-        public void CreateAsync_UserAlreadyExists_ThrowsInvalidOperationException()
+        public async Task CreateAsync_UserAlreadyExists_ThrowsInvalidOperationException()
         {
             // Arrange
             var existing = new User
@@ -94,14 +67,15 @@ namespace UnitTests
                 Password = "bianca123",
                 Email = "bianca.mace@test.com"
             };
-            SetupUsersDbSet(new[] { existing });
+            await _context.Users.AddAsync(existing);
+            await _context.SaveChangesAsync();
 
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _repository.CreateAsync(existing));
 
-            _dbSetMock.Verify(d => d.Add(It.IsAny<User>()), Times.Never);
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Never);
+            var count = await _context.Users.CountAsync();
+            Assert.That(count, Is.EqualTo(1));
         }
 
         // ── GetByEmailAsync ───────────────────────────────────────────────────
@@ -110,26 +84,28 @@ namespace UnitTests
         public async Task GetByEmailAsync_UserExists_ReturnsMappedUser()
         {
             // Arrange
-            var email = "bianca.mace@test.com";
-            SetupUsersDbSet(new[]
+            var user = new User
             {
-                new User { Name = "Bianca", Username = "mace", Password = "pass", Email = email }
-            });
+                Name = "Bianca",
+                Username = "mace",
+                Password = "bianca123",
+                Email = "bianca.mace@test.com"
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
             // Act
-            var result = await _repository.GetByEmailAsync(email);
+            var result = await _repository.GetByEmailAsync(user.Email);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Email, Is.EqualTo(email));
-            Assert.That(result.Username, Is.EqualTo("mace"));
+            Assert.That(result.Email, Is.EqualTo(user.Email));
+            Assert.That(result.Username, Is.EqualTo(user.Username));
         }
 
         [Test]
         public void GetByEmailAsync_UserNotFound_ThrowsInvalidOperationException()
         {
-            // Arrange — empty DbSet (default from SetUp)
-
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _repository.GetByEmailAsync("missing@example.com"));
@@ -141,25 +117,28 @@ namespace UnitTests
         public async Task GetByUsernameAsync_UserExists_ReturnsMappedUser()
         {
             // Arrange
-            var username = "mace";
-            SetupUsersDbSet(new[]
+            var user = new User
             {
-                new User { Name = "Bianca", Username = username, Password = "pass", Email = "bianca.mace@test.com" }
-            });
+                Name = "Bianca",
+                Username = "mace",
+                Password = "bianca123",
+                Email = "bianca.mace@test.com"
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
             // Act
-            var result = await _repository.GetByUsernameAsync(username);
+            var result = await _repository.GetByUsernameAsync(user.Username);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Username, Is.EqualTo(username));
+            Assert.That(result.Username, Is.EqualTo(user.Username));
+            Assert.That(result.Email, Is.EqualTo(user.Email));
         }
 
         [Test]
         public void GetByUsernameAsync_UserNotFound_ThrowsInvalidOperationException()
         {
-            // Arrange — empty DbSet (default from SetUp)
-
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _repository.GetByUsernameAsync("nobody"));
@@ -175,34 +154,31 @@ namespace UnitTests
             {
                 Name = "Bianca",
                 Username = "mace",
-                Password = "oldpass",
                 Email = "bianca.mace@test.com"
             };
-            SetupUsersDbSet(new[] { existing });
+            await _context.Users.AddAsync(existing);
+            await _context.SaveChangesAsync();
 
             var updated = new User
             {
                 Name = "Bianca Updated",
                 Username = "mace",
-                Password = "newpass",
                 Email = "bianca.mace@test.com"
             };
 
             // Act
             await _repository.UpdateAsync(updated);
 
-            // Assert — entity in the set has been mutated
-            Assert.That(existing.Name, Is.EqualTo(updated.Name));
-            Assert.That(existing.Password, Is.EqualTo(updated.Password));
-
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Once);
+            // Assert
+            var inDb = await _context.Users.FirstOrDefaultAsync(u => u.Username == "mace");
+            Assert.That(inDb, Is.Not.Null);
+            Assert.That(inDb.Name, Is.EqualTo(updated.Name));
         }
 
         [Test]
         public void UpdateAsync_UserNotFound_ThrowsInvalidOperationException()
         {
-            // Arrange — empty DbSet (default from SetUp)
-
+            // Arrange
             var user = new User
             {
                 Name = "Ghost",
@@ -214,8 +190,6 @@ namespace UnitTests
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _repository.UpdateAsync(user));
-
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Never);
         }
 
         // ── DeleteAsync ───────────────────────────────────────────────────────
@@ -224,48 +198,45 @@ namespace UnitTests
         public async Task DeleteAsync_UserExists_RemovesAndSaves()
         {
             // Arrange
-            var username = "mace";
-            var existing = new User
+            var user = new User
             {
                 Name = "Bianca",
-                Username = username,
-                Password = "pass",
+                Username = "mace",
+                Password = "bianca123",
                 Email = "bianca.mace@test.com"
             };
-            SetupUsersDbSet(new[] { existing });
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
             // Act
-            await _repository.DeleteAsync(username);
+            await _repository.DeleteAsync("mace");
 
             // Assert
-            _dbSetMock.Verify(d => d.Remove(It.Is<User>(u => u.Username == username)), Times.Once);
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Once);
+            var inDb = await _context.Users.FirstOrDefaultAsync(u => u.Username == "mace");
+            Assert.That(inDb, Is.Null);
         }
 
         [Test]
         public async Task DeleteAsync_UserNotFound_DoesNothing()
         {
-            // Arrange — empty DbSet (default from SetUp)
-
             // Act — should not throw
             await _repository.DeleteAsync("nobody");
 
             // Assert
-            _dbSetMock.Verify(d => d.Remove(It.IsAny<User>()), Times.Never);
-            _contextMock.Verify(c => c.SaveChangesAsync(default), Times.Never);
+            Assert.That(await _context.Users.CountAsync(), Is.EqualTo(0));
         }
 
-        // ── GetManyAsync ──────────────────────────────────────────────────────
+        // ── GetMany ───────────────────────────────────────────────────────────
 
         [Test]
-        public async Task GetManyAsync_ReturnsAllUsers()
+        public async Task GetMany_ReturnsAllUsers()
         {
             // Arrange
-            SetupUsersDbSet(new[]
-            {
-                new User { Name = "Bianca", Username = "mace", Password = "pass1", Email = "bianca@example.com" },
-                new User { Name = "Bianca", Username = "mace", Password = "pass2", Email = "bianca@example.com" }
-            });
+            await _context.Users.AddRangeAsync(
+                new User { Name = "Bianca", Username = "mace", Password = "pass1", Email = "bianca@test.com" },
+                new User { Name = "John",   Username = "johndoe", Password = "pass2", Email = "john@test.com" }
+            );
+            await _context.SaveChangesAsync();
 
             // Act
             var result = _repository.GetMany().ToList();
@@ -273,19 +244,8 @@ namespace UnitTests
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[0].Username, Is.EqualTo("mace"));
-            Assert.That(result[1].Username, Is.EqualTo("mace"));
+            Assert.That(result.Any(u => u.Username == "mace"), Is.True);
+            Assert.That(result.Any(u => u.Username == "johndoe"), Is.True);
         }
-    }
-
-    // ── Async helpers required to mock IAsyncEnumerable on DbSet ─────────────
-
-    internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
-    {
-        private readonly IEnumerator<T> _inner;
-        public TestAsyncEnumerator(IEnumerator<T> inner) => _inner = inner;
-        public T Current => _inner.Current;
-        public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(_inner.MoveNext());
-        public ValueTask DisposeAsync() { _inner.Dispose(); return default; }
     }
 }
