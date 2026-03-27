@@ -25,14 +25,18 @@ public class UserRepository : IUserRepository
     {
         var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null)
+        {
             throw new InvalidOperationException($"User with email '{email}' not found.");
+        }
         return user;
     }
     public async Task<User> GetByUsernameAsync(string username)
     {
         var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null)
+        {
             throw new InvalidOperationException($"User with username '{username}' not found.");
+        }
         return user;
     }
     public async Task DeleteAsync(string username)
@@ -46,7 +50,14 @@ public class UserRepository : IUserRepository
     }
     public async Task UpdateAsync(User user)
     {
-        context.Users.Update(user);
+        var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+        if (existingUser == null)
+        {
+            throw new InvalidOperationException($"User with username '{user.Username}' not found.");
+        }
+        existingUser.Email = user.Email;
+        existingUser.Name = user.Name;
+        context.Users.Update(existingUser);
         await context.SaveChangesAsync();
     }
     public IQueryable<User> GetMany()
