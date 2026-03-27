@@ -20,7 +20,9 @@ namespace UnitTests
             var users = new List<User>();
 
             _dbSetMock = CreateDbSetMock(Enumerable.Empty<User>().AsQueryable());
-            _contextMock = new Mock<PlantifyContext>();
+            _contextMock = new Mock<PlantifyContext>(new DbContextOptionsBuilder<PlantifyContext>()
+                .UseInMemoryDatabase("test")
+                .Options);
             _contextMock.Setup(c => c.Users).Returns(_dbSetMock.Object);
 
             _repository = new UserRepository(_contextMock.Object);
