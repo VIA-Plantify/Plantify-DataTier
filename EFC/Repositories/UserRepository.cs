@@ -12,7 +12,6 @@ public class UserRepository : IUserRepository
     public UserRepository(PlantifyContext context)
     {
         this.context = context;
-        context.Database.EnsureCreated();
     }
 
     public async Task<User> CreateAsync(User user)

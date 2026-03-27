@@ -24,7 +24,6 @@ namespace UnitTests
                 .UseInMemoryDatabase("test")
                 .Options);
             _contextMock.Setup(c => c.Users).Returns(_dbSetMock.Object);
-            _contextMock.Setup(c => c.Database.EnsureCreated()).Returns(true);
             _contextMock.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
             _repository = new UserRepository(_contextMock.Object);
