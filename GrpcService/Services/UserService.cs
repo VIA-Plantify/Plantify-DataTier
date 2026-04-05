@@ -120,8 +120,8 @@ public class UserService : UserServiceProto.UserServiceProtoBase
         {
             Name = user.Name,
             Username = user.Username,
-            Password = user.Password,
             Email = user.Email
+            //Do not send the password to the business layer
         };
     }
 }

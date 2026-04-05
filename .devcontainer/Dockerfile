@@ -20,7 +20,9 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     && apt-get update \
     && apt-get install -y docker-ce-cli docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
+RUN dotnet tool install --global dotnet-ef
 
+ENV PATH="${PATH}:/root/.dotnet/tools"
 ENV DOTNET_USE_POLLING_FILE_WATCHER=1
 
-CMD ["sleep", "infinity"]
+CMD ["bash", "-lc", "while true; do sleep 60; done"]

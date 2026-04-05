@@ -1,33 +1,69 @@
+using EFC.DataAccess;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace EFC.Repositories;
 
 public class UserRepository : IUserRepository
 {
+    private readonly PlantifyContext context;
 
-    public Task<User> CreateAsync(User user)
+    public UserRepository(PlantifyContext context)
     {
-        throw new NotImplementedException();
+        this.context = context;
     }
-    public Task<User> GetByEmailAsync(string email)
+
+    public async Task<User> CreateAsync(User user)
     {
-        throw new NotImplementedException();
+        var existing = context.Users.FirstOrDefault(u => u.Username == user.Username);
+        if (existing != null)
+            throw new InvalidOperationException($"User with username {user.Username} already exists.");
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+        return user;
     }
-    public Task<User> GetByUsernameAsync(string username)
+    public async Task<User> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with email '{email}' not found.");
+        }
+        return user;
     }
-    public Task DeleteAsync(string username)
+    public async Task<User> GetByUsernameAsync(string username)
     {
-        throw new NotImplementedException();
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with username '{username}' not found.");
+        }
+        return user;
     }
-    public Task UpdateAsync(User user)
+    public async Task DeleteAsync(string username)
     {
-        throw new NotImplementedException();
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (user != null)
+        {
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+        }
+    }
+    public async Task UpdateAsync(User user)
+    {
+        var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+        if (existingUser == null)
+        {
+            throw new InvalidOperationException($"User with username '{user.Username}' not found.");
+        }
+        existingUser.Email = user.Email;
+        existingUser.Name = user.Name;
+        context.Users.Update(existingUser);
+        await context.SaveChangesAsync();
     }
     public IQueryable<User> GetMany()
     {
-        throw new NotImplementedException();
+        return context.Users.AsQueryable();
     }
 }

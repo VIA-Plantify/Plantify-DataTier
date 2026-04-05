@@ -1,13 +1,13 @@
-using Moq;
-using MockQueryable.Moq;
-using Grpc.Core;
 using Entities;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using GrpcService;
 using GrpcService.Services;
 using MockQueryable;
-using MockQueryable.EntityFrameworkCore;
+using Moq;
 using RepositoryContracts;
+
+namespace UnitTests;
 
 [TestFixture]
 public class UserServiceTests
@@ -44,7 +44,7 @@ public class UserServiceTests
         };
 
         _repoMock.Setup(r => r.CreateAsync(It.IsAny<User>()))
-                 .ReturnsAsync(user);
+            .ReturnsAsync(user);
 
         // Act
         var result = await _service.Create(request, null);
@@ -75,7 +75,7 @@ public class UserServiceTests
         };
 
         _repoMock.Setup(r => r.CreateAsync(It.IsAny<User>()))
-                 .ThrowsAsync(new InvalidOperationException("User already exists"));
+            .ThrowsAsync(new InvalidOperationException("User already exists"));
 
         // Act
         var exception = Assert.ThrowsAsync<RpcException>(() =>
