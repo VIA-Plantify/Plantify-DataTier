@@ -19,6 +19,9 @@
 
 ## Creating a dev container
 
+<h1>MAKE SURE YOUR DOCKER SERVICE IS RUNNING</h1>
+
+
 Open **Settings -> File -> Remote Development**
 
 <img width="347" height="544" alt="image" src="https://github.com/user-attachments/assets/c7f741c2-236f-4809-94b4-2d1a80dbe55b" />
@@ -40,7 +43,13 @@ https://github.com/VIA-Plantify/Plantify-DataTier.git
 
 <img width="1008" height="284" alt="image" src="https://github.com/user-attachments/assets/6882b5b8-ed43-441c-ad78-ee717173646c" />
 
-select **development or the branch currently under development** and continue, the ide should setup a remote container
+select **development or the branch currently under development** and go to specific version of devcontainer.
+
+<h2>If running on linux or wsl use .devcontainer/devcontainer.linux.json</h2>
+
+<h2>If running on Windows use .devcontainer/devcontainer.windows.json</h2>
+
+
 
 <img width="988" height="196" alt="image" src="https://github.com/user-attachments/assets/11806b2e-2bd2-4afd-a2aa-92a5374bbffb" />
 
