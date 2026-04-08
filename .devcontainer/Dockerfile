@@ -25,4 +25,4 @@ RUN dotnet tool install --global dotnet-ef
 ENV PATH="${PATH}:/root/.dotnet/tools"
 ENV DOTNET_USE_POLLING_FILE_WATCHER=1
 
-CMD ["bash", "-lc", "while true; do sleep 60; done"]
+CMD ["sleep", "infinity"]

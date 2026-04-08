@@ -1,8 +1,26 @@
-# This tutorial is for Jetbrains Rider
+# This tutorial is for JetBrains Rider
 
+## Table of Contents
+- [Creating a dev container](#creating-a-dev-container)
+- [Refreshing Grpc Container Manual](#refreshing-grpc-container-manual)
+- [Refresh Grpc Container with Button](#refresh-grpc-container-button)
+- [Troubleshooting](#troubleshooting)
+  - [Containers not being displayed in docker desktop](#not-seeing-containers-in-docker-desktop)
+  - [Database container dependency](#database-container-dependency)
+  - [Stale image or unupdated project](#stale-image)
+  - [Older images and volumes](#older-images-and-volumes)
+    - [Volumes](#volumes)
+    - [Images](#images)
+    - [Network](#network)
+  - [Rider is not showing files upon container start](#rider-not-displaying-files)
+  - [Container creation stuck loading](#rider-hangs-when-creating-containers)
+  - [Refresh script fail](#script-failing-inside-container)
 ## Update Rider to the latest version
 
 ## Creating a dev container
+
+<h1>MAKE SURE YOUR DOCKER SERVICE IS RUNNING</h1>
+
 
 Open **Settings -> File -> Remote Development**
 
@@ -25,25 +43,31 @@ https://github.com/VIA-Plantify/Plantify-DataTier.git
 
 <img width="1008" height="284" alt="image" src="https://github.com/user-attachments/assets/6882b5b8-ed43-441c-ad78-ee717173646c" />
 
-select **development or the branch currently under development** and continue, the ide should setup a remote container
+select **development or the branch currently under development** and go to specific version of devcontainer.
 
 <img width="988" height="196" alt="image" src="https://github.com/user-attachments/assets/11806b2e-2bd2-4afd-a2aa-92a5374bbffb" />
 
+<h2>If running on linux or wsl use .devcontainer/devcontainer.linux.json</h2>
+
+<h2>If running on Windows use .devcontainer/devcontainer.windows.json</h2>
+
+<img width="995" height="198" alt="image" src="https://github.com/user-attachments/assets/bdddac4b-4cd8-4880-8592-8f9b1c63dca6" />
+
+## Refreshing Grpc Container Manual
 
 # IMPORTANT
 ### For the Grpc container to run properly you must have the database running from the container provided
 
-## Refreshing Grpc Container 
 inside the devcontainer run: ``scripts/refresh-grpc.sh``
 
 outside container it gets a bit more complicated,
-I know only for linux but it should work in WSL:
+I know only for linux, but it should work in WSL:
 
 run: ``chmod +x scripts/refresh-grpc.sh`` to make it executable
 
 afterwards run: ``./scripts/refresh-grpc.sh``
 
-## Making an IDE button for refresh script in Rider
+## Refresh Grpc Container Button
 
 Go to the top of the options where usually the program is being ran
 
@@ -68,3 +92,99 @@ Add the script and the correct path from scripts and apply
 Now you should have a button that runs the script
 
 <img width="317" height="46" alt="image" src="https://github.com/user-attachments/assets/9cfed1a3-7c74-4098-af56-41f1426b56a5" />
+
+## Troubleshooting 
+
+### Not seeing containers in docker desktop
+
+Make sure to uncheck the show only running containers
+options to see everything.
+
+### Database container dependency
+
+If the gRPC container does not work or start make sure the postgres container is running
+
+### Stale image
+
+Make sure to pull in all the changes in development before continuing, some of the code and fixes might have been already made
+
+Run the refresh script made in the previous step to refresh the production container.
+
+### Older images and volumes
+
+If the container configuration has been changed or problems persist, delete the images of the container and the jetbrains volumes (not shared volume)
+
+To see the volumes and images either use ur GUI tool (For windows try docker desktop) (For linux I recommend lazydocker to see images and volumes along side ducker to see running containers)
+
+If a GUI tool does not exist or cannot be accessed run the follwoing commands
+
+#### Volumes
+Run
+```shell 
+docker volume ls
+```
+
+Look for:
+```
+local     jb_devcontainer_sources_ ...
+```
+
+Run
+```shell
+docker rm (volume name)
+```
+
+#### Images
+Run
+```shell
+docker image ls
+```
+
+Look for: 
+```
+plantify-businesstier-businessdev:latest     
+plantify-businesstier_plantify-businesstier-businessdev:latest
+plantify-datatier-datadev:latest
+plantify-datatier-grpcserver:latest
+plantify-datatier_plantify-datatier-datadev:latest
+plantify-datatier_plantify-datatier-grpcserver:latest
+```
+Run
+```shell
+docker rm (image name)
+```
+
+#### Network
+
+```shell
+docker network list
+```
+Look for
+```
+backend
+```
+
+If the problem persists run:
+
+```shell
+docker network rm backend
+```
+
+Close and rebuild the containers or use to create the network
+```shell
+docker network create --driver bridge backend
+```
+
+### Rider not displaying files
+
+If you do not see the files after opening 
+a container close the container and restart rider, they will show up after.
+
+### Rider hangs when creating containers
+
+If rider hangs try going into a project then to remote development and try that.
+
+### Script failing inside container
+
+Rebuild the container after pulling in the project or go back and [delete volumes images](#older-images-and-volumes) and do a fresh install.
+
