@@ -1,22 +1,9 @@
+name: plantify_production
+
 services:
-  datadev:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    container_name: datadev
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
-    command: sleep infinity
-    user: root
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - backend
   grpcserver:
-    image: grpcserver
-    container_name: grpcserver
+    image: grpcserverdata : latest
+    container_name: grpcserverdata
     build:
       context: .
       dockerfile: ./GrpcService/Dockerfile
@@ -32,7 +19,7 @@ services:
     networks:
       backend:
         aliases:
-          - grpcserver
+          - grpcserverdata
   postgres:
     image: postgres:17-alpine
     environment:

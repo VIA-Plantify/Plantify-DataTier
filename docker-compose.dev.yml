@@ -1,0 +1,20 @@
+name: dev
+
+services:
+  datadev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: datadev
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: sleep infinity
+    user: root
+    networks:
+      - backend
+  
+networks:
+  backend:
+    external: true
+    name: backend
