@@ -35,3 +35,11 @@ else
 fi
 
 echo "PostgreSQL setup is ready."
+
+echo "Applying EF Core migrations..."
+
+dotnet ef database update \
+  --project ./EFC/EFC.csproj \
+  --startup-project ./GrpcService/GrpcService.csproj
+
+echo "Migrations applied successfully."
