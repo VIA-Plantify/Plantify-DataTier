@@ -14,3 +14,9 @@ else
 fi
 
 echo "Base Docker setup complete."
+
+echo "Starting database initialization..."
+
+bash /workspace/.scripts/init-db.sh
+
+echo "Database initialization complete."
