@@ -1,5 +1,63 @@
 # This tutorial is for JetBrains Rider
 
+## IMPORTANT!!
+
+### First time setup
+
+This step creates the shared Docker network used by the dev environment.
+
+#### Linux / macOS / Inside the dev container
+
+```bash
+./scripts/setup-dev.sh
+```
+or in the console:
+
+```bash
+NETWORK="backend"
+
+echo "Checking Docker..."
+docker info >/dev/null 2>&1
+
+if ! docker network inspect "$NETWORK" >/dev/null 2>&1; then
+  echo "Creating Docker network: $NETWORK"
+  docker network create --driver bridge "$NETWORK"
+else
+  echo "Docker network already exists: $NETWORK"
+fi
+
+echo "Base Docker setup complete."
+```
+
+#### Windows
+```ps1
+./scripts/setup-dev.ps1
+```
+
+Or in Powershell:
+
+```ps1
+$NETWORK = "backend"
+
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Docker is not running or not installed."
+    exit 1
+}
+
+docker network inspect $NETWORK *> $null
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Creating Docker network: $NETWORK"
+    docker network create $NETWORK
+} else {
+    Write-Host "Docker network already exists: $NETWORK"
+}
+
+Write-Host "Base Docker setup complete."
+```
+
+
 ## Table of Contents
 - [Creating a dev container](#creating-a-dev-container)
 - [Refreshing Grpc Container Manual](#refreshing-grpc-container-manual)
@@ -46,12 +104,6 @@ https://github.com/VIA-Plantify/Plantify-DataTier.git
 select **development or the branch currently under development** and go to specific version of devcontainer.
 
 <img width="988" height="196" alt="image" src="https://github.com/user-attachments/assets/11806b2e-2bd2-4afd-a2aa-92a5374bbffb" />
-
-<h2>If running on linux or wsl use .devcontainer/devcontainer.linux.json</h2>
-
-<h2>If running on Windows use .devcontainer/devcontainer.windows.json</h2>
-
-<img width="995" height="198" alt="image" src="https://github.com/user-attachments/assets/bdddac4b-4cd8-4880-8592-8f9b1c63dca6" />
 
 ## Refreshing Grpc Container Manual
 
