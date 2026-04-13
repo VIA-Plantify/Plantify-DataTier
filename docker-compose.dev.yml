@@ -11,10 +11,3 @@ services:
     working_dir: /workspace
     command: sleep infinity
     user: root
-    networks:
-      - backend
-  
-networks:
-  backend:
-    external: true
-    name: backend
