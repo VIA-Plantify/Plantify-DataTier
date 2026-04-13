@@ -5,7 +5,7 @@
   "workspaceFolder": "/workspace",
   "shutdownAction": "none",
   "updateRemoteUserUID": false,
-  "postCreateCommand": "/workspace/.scripts/init-db.sh",
+  "postCreateCommand": "chmod +x /workspace/.scripts/*.sh && bash /workspace/.scripts/setup-dev.sh && bash /workspace/.scripts/init-db.sh ",
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
