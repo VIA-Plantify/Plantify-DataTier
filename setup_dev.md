@@ -9,7 +9,7 @@ docker volume rm $(docker volume ls -q | grep jb_devcontainer_sources_)
 ```
 
 
-### First time setup
+### First time setup without using the devcontainer.json
 
 This step creates the shared Docker network used by the dev environment.
 
