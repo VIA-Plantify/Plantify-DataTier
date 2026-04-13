@@ -24,7 +24,7 @@ jdbc:postgresql://localhost:55432/plantify?password=plantifydev&user=dev
 jdbc:postgresql://host.docker.internal:55432/plantify?user=dev&password=plantifydev
 ```
 
-<h3> In production containers</h3>>
+<h3> In production containers</h3>
 
 ```
 jdbc:postgresql://postgres:5432/plantify?password=plantifydev&user=dev
