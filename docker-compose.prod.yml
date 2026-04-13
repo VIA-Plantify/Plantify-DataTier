@@ -44,6 +44,6 @@ volumes:
   postgres_data:
 
 networks:
-  backend:
+  plantify-network:
     external: true
     name: plantify-network
