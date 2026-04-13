@@ -36,6 +36,10 @@ fi
 
 echo "PostgreSQL setup is ready."
 
+echo "Restoring .NET dependencies..."
+
+dotnet restore ./Plantify-DataTier.sln
+
 echo "Applying EF Core migrations..."
 
 dotnet ef database update \
