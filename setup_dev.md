@@ -16,7 +16,7 @@ This step creates the shared Docker network used by the dev environment.
 #### Linux / macOS / Inside the dev container
 
 ```bash
-./scripts/setup-dev.sh
+./.scripts/setup-dev.sh
 ```
 or in the console:
 
@@ -38,7 +38,7 @@ echo "Base Docker setup complete."
 
 #### Windows
 ```ps1
-./scripts/setup-dev.ps1
+./.scripts/setup-dev.ps1
 ```
 
 Or in Powershell:
@@ -117,14 +117,14 @@ select **development or the branch currently under development** and go to speci
 # IMPORTANT
 ### For the Grpc container to run properly you must have the database running from the container provided
 
-inside the devcontainer run: ``scripts/refresh-grpc.sh``
+inside the devcontainer run: ``.scripts/refresh-grpc.sh``
 
 outside container it gets a bit more complicated,
 I know only for linux, but it should work in WSL:
 
-run: ``chmod +x scripts/refresh-grpc.sh`` to make it executable
+run: ``chmod +x .scripts/refresh-grpc.sh`` to make it executable
 
-afterwards run: ``./scripts/refresh-grpc.sh``
+afterwards run: ``./.scripts/refresh-grpc.sh``
 
 ## Refresh Grpc Container Button
 
