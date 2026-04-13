@@ -23,7 +23,7 @@ done
 echo "Checking whether database '${DB_NAME}' exists..."
 DB_EXISTS="$(
   docker compose -p "${PROJECT_NAME}" -f "${COMPOSE_FILE}" exec -T "${SERVICE}" \
-    psql -U "${DB_USER}" -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}';" \
+    psql -U "${DB_USER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}';" \
     | tr -d '[:space:]'
 )"
 
