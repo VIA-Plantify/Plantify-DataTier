@@ -21,7 +21,7 @@ jdbc:postgresql://localhost:55432/plantify?password=plantifydev&user=dev
 <h3>From container</h3>
 
 ```
-Host=host.docker.internal;Port=55432;Database=plantify;Username=dev;Password=plantifydev
+jdbc:postgresql://host.docker.internal:55432/plantify?user=dev&password=plantifydev
 ```
 
 <h3> In production containers</h3>>
