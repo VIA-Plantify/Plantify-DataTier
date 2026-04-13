@@ -1,6 +1,6 @@
 {
   "name": "C# Data Dev",
-  "dockerComposeFile": "../docker-compose-data.yml",
+  "dockerComposeFile": "../docker-compose.dev.yml",
   "service": "datadev",
   "workspaceFolder": "/workspace",
   "shutdownAction": "none",
