@@ -1,0 +1,16 @@
+name: dev
+
+services:
+  datadev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: datadev
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: sleep infinity
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:10081
+    user: root

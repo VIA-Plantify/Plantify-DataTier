@@ -1,27 +1,14 @@
+name: plantify_production
+
 services:
-  datadev:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    container_name: datadev
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
-    command: sleep infinity
-    user: root
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - backend
   grpcserver:
-    image: grpcserver
-    container_name: grpcserver
+    image: grpcserverdata:latest
+    container_name: grpcserverdata
     build:
       context: .
       dockerfile: ./GrpcService/Dockerfile
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://0.0.0.0:10081
     user: root
     depends_on:
@@ -30,9 +17,9 @@ services:
     ports:
       - "10081:10081"
     networks:
-      backend:
+      plantify-network:
         aliases:
-          - grpcserver
+          - grpcserverdata
   postgres:
     image: postgres:17-alpine
     environment:
@@ -45,7 +32,7 @@ services:
     ports:
       - "55432:5432"
     networks:
-      - backend
+      - plantify-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dev -d plantify"]
       interval: 10s
@@ -57,6 +44,6 @@ volumes:
   postgres_data:
 
 networks:
-  backend:
+  plantify-network:
     external: true
-    name: backend
+    name: plantify-network

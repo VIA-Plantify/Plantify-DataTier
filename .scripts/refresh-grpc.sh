@@ -3,8 +3,8 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-COMPOSE_FILE="${PROJECT_ROOT}/docker-compose-data.yml"
-PROJECT_NAME="plantify-datatier_plantify-datatier"
+COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.prod.yml"
+PROJECT_NAME="plantify_production"
 SERVICE="grpcserver"
 CONTAINER_NAME="grpcserver"
 
