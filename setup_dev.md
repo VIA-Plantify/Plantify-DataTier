@@ -1,5 +1,70 @@
 # This tutorial is for JetBrains Rider
 
+## IMPORTANT!!
+
+## If having problems and want to nuke all containers we have made use:
+```shell
+docker system prune -a
+docker volume rm $(docker volume ls -q | grep jb_devcontainer_sources_)
+```
+
+
+### First time setup without using the devcontainer.json
+
+This step creates the shared Docker network used by the dev environment.
+
+#### Linux / macOS / Inside the dev container
+
+```bash
+./.scripts/setup-dev.sh
+```
+or in the console:
+
+```bash
+NETWORK="plantify-network"
+
+echo "Checking Docker..."
+docker info >/dev/null 2>&1
+
+if ! docker network inspect "$NETWORK" >/dev/null 2>&1; then
+  echo "Creating Docker network: $NETWORK"
+  docker network create --driver bridge "$NETWORK"
+else
+  echo "Docker network already exists: $NETWORK"
+fi
+
+echo "Base Docker setup complete."
+```
+
+#### Windows
+```ps1
+./.scripts/setup-dev.ps1
+```
+
+Or in Powershell:
+
+```ps1
+$NETWORK = "plantify-network"
+
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Docker is not running or not installed."
+    exit 1
+}
+
+docker network inspect $NETWORK *> $null
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Creating Docker network: $NETWORK"
+    docker network create $NETWORK
+} else {
+    Write-Host "Docker network already exists: $NETWORK"
+}
+
+Write-Host "Base Docker setup complete."
+```
+
+
 ## Table of Contents
 - [Creating a dev container](#creating-a-dev-container)
 - [Refreshing Grpc Container Manual](#refreshing-grpc-container-manual)
@@ -47,25 +112,19 @@ select **development or the branch currently under development** and go to speci
 
 <img width="988" height="196" alt="image" src="https://github.com/user-attachments/assets/11806b2e-2bd2-4afd-a2aa-92a5374bbffb" />
 
-<h2>If running on linux or wsl use .devcontainer/devcontainer.linux.json</h2>
-
-<h2>If running on Windows use .devcontainer/devcontainer.windows.json</h2>
-
-<img width="995" height="198" alt="image" src="https://github.com/user-attachments/assets/bdddac4b-4cd8-4880-8592-8f9b1c63dca6" />
-
 ## Refreshing Grpc Container Manual
 
 # IMPORTANT
 ### For the Grpc container to run properly you must have the database running from the container provided
 
-inside the devcontainer run: ``scripts/refresh-grpc.sh``
+inside the devcontainer run: ``.scripts/refresh-grpc.sh``
 
 outside container it gets a bit more complicated,
 I know only for linux, but it should work in WSL:
 
-run: ``chmod +x scripts/refresh-grpc.sh`` to make it executable
+run: ``chmod +x .scripts/refresh-grpc.sh`` to make it executable
 
-afterwards run: ``./scripts/refresh-grpc.sh``
+afterwards run: ``./.scripts/refresh-grpc.sh``
 
 ## Refresh Grpc Container Button
 
