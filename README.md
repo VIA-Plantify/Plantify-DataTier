@@ -15,9 +15,11 @@
 
 
 <h3>From native machine</h3>
+
 ```
 jdbc:postgresql://localhost:55432/plantify?password=plantifydev&user=dev 
 ```
+
 <h3>From container</h3>
 
 ```
