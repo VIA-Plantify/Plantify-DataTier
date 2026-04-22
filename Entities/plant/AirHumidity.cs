@@ -1,8 +1,11 @@
 namespace Entities.plant;
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 public class AirHumidity
 {
-    public int Id {get; set;}
+    [Key] public int Id {get; set;}
     
     //EFC
     public int PlantId { get; set; }
