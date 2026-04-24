@@ -12,9 +12,9 @@ public class Temperature
     
     //EFC
     
-    public int PlantId { get; set; }
+    public string PlantMAC { get; set; } = string.Empty;
     
-    [ForeignKey(nameof(PlantId))]
+    [ForeignKey(nameof(PlantMAC))]
     public Plant Plant { get; set; } = null!; //For EFC
     
 }

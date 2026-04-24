@@ -8,8 +8,8 @@ public class LightIntensity
     [Key] public int Id {get; set;}
 
     //EFC
-    public int PlantId { get; set; }
+    public string PlantMAC { get; set; } = string.Empty;
     
-    [ForeignKey(nameof(PlantId))]
+    [ForeignKey(nameof(PlantMAC))]
     public Plant Plant { get; set; } = null!; //For EFC
 }

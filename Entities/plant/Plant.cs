@@ -5,7 +5,8 @@ namespace Entities.plant;
 
 public class Plant
 {
-    [Key] public int Id {get; set;}
+    //MAC address of the arduino
+    [Key] public string MAC {get; set;} = string.Empty;
     public string Name { get; set; } = string.Empty;
     
     //EFC
