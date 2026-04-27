@@ -7,7 +7,7 @@ public class Temperature
 {
     [Key]
     public int Id { get; set; }
-    public double? CurrentTemperature { get; set; }
+    public double? Value { get; set; }
     public TemperatureScale TemperatureScale { get; set; } = TemperatureScale.C;
     
     //EFC

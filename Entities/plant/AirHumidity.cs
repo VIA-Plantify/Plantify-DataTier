@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class AirHumidity
 {
     [Key] public int Id {get; set;}
-    
+    public double? Value { get; set; }
     //EFC
     public string PlantMAC { get; set; } = string.Empty;
     
