@@ -47,7 +47,7 @@ public class PlantRepositoryTest
         };
 
         // Act
-        var createdPlant = await _plantRepository.CreateAsync("testuser", plant);
+        var createdPlant = await _plantRepository.CreateAsync(plant);
 
         // Assert
         Assert.That(createdPlant, Is.Not.Null);
@@ -70,7 +70,7 @@ public class PlantRepositoryTest
             OptimalLightIntensity = 1000
         };
 
-        await _plantRepository.CreateAsync("testuser", plant);
+        await _plantRepository.CreateAsync(plant);
 
         // Act
         var retrievedPlant = await _plantRepository.GetPlantAsync("testuser", "123456");
@@ -95,7 +95,7 @@ public class PlantRepositoryTest
             OptimalLightIntensity = 1000
         };
 
-        await _plantRepository.CreateAsync("testuser", plant);
+        await _plantRepository.CreateAsync(plant);
 
         // Act
         await _plantRepository.DeleteAsync("testuser", "123456");
@@ -120,7 +120,7 @@ public class PlantRepositoryTest
             OptimalLightIntensity = 1000
         };
 
-        await _plantRepository.CreateAsync("testuser", plant);
+        await _plantRepository.CreateAsync(plant);
 
         var updatedPlant = new Plant
         {
@@ -134,7 +134,7 @@ public class PlantRepositoryTest
         };
 
         // Act
-        await _plantRepository.UpdateAsync("testuser", updatedPlant);
+        await _plantRepository.UpdateAsync(updatedPlant);
 
         // Assert
         var retrievedPlant = await _context.Plants.FirstOrDefaultAsync(p => p.MAC == "123456");
@@ -157,7 +157,7 @@ public class PlantRepositoryTest
             OptimalLightIntensity = 1000
         };
 
-        await _plantRepository.CreateAsync("testuser", plant);
+        await _plantRepository.CreateAsync(plant);
 
         var duplicatePlant = new Plant
         {
@@ -173,7 +173,7 @@ public class PlantRepositoryTest
         // Act & Assert
         var exception =  Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await _plantRepository.CreateAsync("testuser", duplicatePlant);
+            await _plantRepository.CreateAsync(duplicatePlant);
         });
 
         Assert.That(exception.Message, Is.EqualTo($"Plant with MAC {duplicatePlant.MAC} already exists."));
@@ -213,7 +213,7 @@ public class PlantRepositoryTest
         // Act & Assert
         var exception =  Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await _plantRepository.UpdateAsync("testuser", plant);
+            await _plantRepository.UpdateAsync(plant);
         });
 
         Assert.That(exception.Message, Is.EqualTo($"Plant with MAC '{plant.MAC}' for user 'testuser' not found."));
@@ -245,8 +245,8 @@ public class PlantRepositoryTest
             OptimalLightIntensity = 1100
         };
 
-        await _plantRepository.CreateAsync("testuser", plant1);
-        await _plantRepository.CreateAsync("testuser", plant2);
+        await _plantRepository.CreateAsync(plant1);
+        await _plantRepository.CreateAsync(plant2);
 
         // Act
         var plants = _plantRepository.GetMany("testuser").ToList();

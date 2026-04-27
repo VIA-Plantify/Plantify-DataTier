@@ -17,15 +17,14 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     private readonly PlantifyContext context = context;
 
     /// <summary>
-    /// Asynchronously creates a new plant entry in the database.
+    /// Creates a new plant asynchronously.
     /// </summary>
-    /// <param name="username">The username associated with the plant.</param>
-    /// <param name="plant">The Plant object to be created.</param>
-    /// <returns>A Task representing the asynchronous operation, containing the created Plant object if successful.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when a plant with the same MAC address already exists for the given username.</exception>
-    public async Task<Plant> CreateAsync(string username, Plant plant)
+    /// <param name="plant">The plant entity to be created.</param>
+    /// <returns>A task representing the asynchronous operation that returns the created Plant object.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when a plant with the same MAC address already exists for the given user.</exception>
+    public async Task<Plant> CreateAsync(Plant plant)
     {
-        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == username && p.MAC == plant.MAC);
+        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
         if (existingPlant != null)
         {
             throw new InvalidOperationException($"Plant with MAC {plant.MAC} already exists.");
@@ -68,19 +67,19 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
         }
     }
 
+
     /// <summary>
-    /// Asynchronously updates an existing plant for a given user.
+    /// Updates an existing plant asynchronously.
     /// </summary>
-    /// <param name="username">The username of the owner of the plant.</param>
-    /// <param name="plant">The updated plant object containing new values.</param>
-    /// <returns>A task that represents the asynchronous operation, returning the updated Plant object if successful.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when a plant with the specified MAC address for the given user is not found.</exception>
-    public async Task UpdateAsync(string username, Plant plant)
+    /// <param name="plant">The updated plant entity.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the specified plant does not exist for the given user.</exception>
+    public async Task UpdateAsync( Plant plant)
     {
-        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == username && p.MAC == plant.MAC);
+        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
         if (existingPlant == null)
         {
-            throw new InvalidOperationException($"Plant with MAC '{plant.MAC}' for user '{username}' not found.");
+            throw new InvalidOperationException($"Plant with MAC '{plant.MAC}' for user '{plant.Username}' not found.");
         }
     
         existingPlant.Name = plant.Name;
