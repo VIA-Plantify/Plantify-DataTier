@@ -26,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EFC\EFC.csproj" />
       <ProjectReference Include="..\GrpcService\GrpcService.csproj" />
       <ProjectReference Include="..\RepositoryContracts\RepositoryContracts.csproj" />
     </ItemGroup>
