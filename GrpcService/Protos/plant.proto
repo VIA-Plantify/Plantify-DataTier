@@ -4,7 +4,7 @@ option csharp_namespace = "GrpcService";
 
 package plant;
 import "google/protobuf/empty.proto";
-import "sensors.proto";
+import "Protos/sensors.proto";
 // enums
 enum TemperatureScale {
   C = 0;
