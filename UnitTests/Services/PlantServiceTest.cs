@@ -9,6 +9,7 @@ using TemperatureScale = GrpcService.TemperatureScale;
 
 namespace UnitTests.Services;
 
+
 [TestFixture]
 [TestOf(typeof(PlantService))]
 public class PlantServiceTest
