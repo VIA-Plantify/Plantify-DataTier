@@ -24,12 +24,13 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <exception cref="InvalidOperationException">Thrown when a plant with the same MAC address already exists for the given user.</exception>
     public async Task<Plant> CreateAsync(Plant plant)
     {
-        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
+        var existingPlant =
+            await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
         if (existingPlant != null)
         {
             throw new InvalidOperationException($"Plant with MAC {plant.MAC} already exists.");
         }
-    
+
         context.Plants.Add(plant);
         await context.SaveChangesAsync();
         return plant;
@@ -40,14 +41,39 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// </summary>
     /// <param name="username">The username associated with the plant.</param>
     /// <param name="plantMAC">The MAC address of the plant.</param>
+    /// <param name="number">Number of reading that should be send with the plant</param>
     /// <returns>A task representing the asynchronous operation that returns the Plant object if found; otherwise, throws an InvalidOperationException.</returns>
-    public async Task<Plant> GetPlantAsync(string username, string plantMAC)
+    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? number)
     {
-        var plant = await context.Plants.FirstOrDefaultAsync(p => p.Username == username && p.MAC == plantMAC);
+        var take = number is null or 0 ? 10 : number.Value;
+        //TODO depending on water intake remove this todo or add the code to get water intakes
+        var plant = await context.Plants.Where(p => p.Username == username && p.MAC == plantMAC)
+            .Select(p => new Plant()
+            {
+                MAC = p.MAC,
+                Username = p.Username,
+                Name = p.Name,
+                Scale = p.Scale,
+                OptimalTemperature = p.OptimalTemperature,
+                OptimalAirHumidity = p.OptimalAirHumidity,
+                OptimalSoilHumidity = p.OptimalSoilHumidity,
+                OptimalLightIntensity = p.OptimalLightIntensity,
+                OptimalLightPeriod = p.OptimalLightPeriod,
+                
+                Temperatures = p.Temperatures.OrderByDescending(r => r.Id)
+                    .Take(take).ToList(),
+                SoilHumidities = p.SoilHumidities.OrderByDescending(r => r.Id)
+                    .Take(take).ToList(),
+                AirHumidities = p.AirHumidities.OrderByDescending(r => r.Id)
+                    .Take(take).ToList(),
+                LightIntensities = p.LightIntensities.OrderByDescending(r => r.Id)
+                    .Take(take).ToList(),
+            }).FirstOrDefaultAsync();
         if (plant == null)
         {
             throw new InvalidOperationException($"Plant with MAC '{plantMAC}' for user '{username}' not found.");
         }
+
         return plant;
     }
 
@@ -74,20 +100,21 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <param name="plant">The updated plant entity.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the specified plant does not exist for the given user.</exception>
-    public async Task UpdateAsync( Plant plant)
+    public async Task UpdateAsync(Plant plant)
     {
-        var existingPlant = await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
+        var existingPlant =
+            await context.Plants.FirstOrDefaultAsync(p => p.Username == plant.Username && p.MAC == plant.MAC);
         if (existingPlant == null)
         {
             throw new InvalidOperationException($"Plant with MAC '{plant.MAC}' for user '{plant.Username}' not found.");
         }
-    
+
         existingPlant.Name = plant.Name;
         existingPlant.OptimalTemperature = plant.OptimalTemperature;
         existingPlant.OptimalAirHumidity = plant.OptimalAirHumidity;
         existingPlant.OptimalSoilHumidity = plant.OptimalSoilHumidity;
         existingPlant.OptimalLightIntensity = plant.OptimalLightIntensity;
-    
+
         context.Plants.Update(existingPlant);
         await context.SaveChangesAsync();
     }
@@ -97,8 +124,43 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// </summary>
     /// <param name="username">The username of the owner of the plants.</param>
     /// <returns>An IQueryable collection of Plant objects that match the given username.</returns>
-    public IQueryable<Plant> GetMany(string username)
+    public IQueryable<Plant> GetMany(string username, int? number)
     {
-        return context.Plants.Where(Plant => Plant.Username == username).AsQueryable();
+        var take = number is null or 0 ? 10 : number.Value;
+
+        return context.Plants
+            .Where(p => p.Username == username)
+            .Select(p => new Plant
+            {
+                MAC = p.MAC,
+                Username = p.Username,
+                Name = p.Name,
+                Scale = p.Scale,
+                OptimalTemperature = p.OptimalTemperature,
+                OptimalAirHumidity = p.OptimalAirHumidity,
+                OptimalSoilHumidity = p.OptimalSoilHumidity,
+                OptimalLightIntensity = p.OptimalLightIntensity,
+                OptimalLightPeriod = p.OptimalLightPeriod,
+                
+                Temperatures = p.Temperatures
+                    .OrderByDescending(r => r.Id)
+                    .Take(take)
+                    .ToList(),
+
+                SoilHumidities = p.SoilHumidities
+                    .OrderByDescending(r => r.Id)
+                    .Take(take)
+                    .ToList(),
+
+                AirHumidities = p.AirHumidities
+                    .OrderByDescending(r => r.Id)
+                    .Take(take)
+                    .ToList(),
+
+                LightIntensities = p.LightIntensities
+                    .OrderByDescending(r => r.Id)
+                    .Take(take)
+                    .ToList(),
+            });
     }
 }

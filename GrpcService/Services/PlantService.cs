@@ -37,7 +37,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
         try
         {
             var createdPlant = await repository.CreateAsync(plant);
-            return MapToPlantResponse(createdPlant, null);
+            return MapToPlantResponse(createdPlant);
         }
         catch (InvalidOperationException ex)
         {
@@ -67,8 +67,8 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     {
         try
         {
-            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC);
-            return MapToPlantResponse(plant, request.Number);
+            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, request.Number);
+            return MapToPlantResponse(plant);
         }
         catch (InvalidOperationException ex)
         {
@@ -86,11 +86,11 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     public async override Task<GetManyPlantResponse> GetPlantsByUsername(GetPlantsByUsernameRequest request,
         ServerCallContext context)
     {
-        var plants = repository.GetMany(request.Username);
+        var plants = repository.GetMany(request.Username, request.Number);
         var response = new GetManyPlantResponse();
         foreach (var plant in await plants.ToListAsync())
         {
-            response.Plants.Add(MapToPlantResponse(plant, request.Number));
+            response.Plants.Add(MapToPlantResponse(plant));
         }
         return response;
     }
@@ -103,7 +103,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>An empty response indicating successful update.</returns>
     public async override Task<Empty> Update(UpdatePlantRequest request, ServerCallContext context)
     {
-        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC);
+        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, number: null);
     
         if (plant == null)
         {
@@ -144,8 +144,13 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// </summary>
     /// <param name="entity">The Plant entity to map.</param>
     /// <returns>A PlantResponse object representing the mapped plant data.</returns>
-    private PlantResponse MapToPlantResponse(Plant entity, int? number)
+    private PlantResponse MapToPlantResponse(Plant entity)
     {
+        var temperatures = entity.Temperatures ?? [];
+        var airHumidities = entity.AirHumidities ?? [];
+        var soilHumidities = entity.SoilHumidities ?? [];
+        var lightIntensities = entity.LightIntensities ?? [];
+
         var response = MapToOptimalConfiguration(entity);
         response.PlantMAC = entity.MAC;
         response.Name = entity.Name;
@@ -153,28 +158,28 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
 
         response.CurrentTemperature = new TemperatureResponse
         {
-            Value = entity.Temperatures.LastOrDefault()?.Value ?? 0,
-            PreviousValuesList = {entity.Temperatures.OrderByDescending(temperature => temperature.Id).Take(number ?? int.MaxValue).Select(temperature => temperature.Value ?? 0)}
+            Value = temperatures.FirstOrDefault()?.Value ?? 0,
+            PreviousValuesList = { temperatures.Select(t => t.Value ?? 0) }
         };
-        
+
         response.CurrentAirHumidity = new AirHumidityResponse
         {
-            Value = entity.AirHumidities.LastOrDefault()?.Value ?? 0,
-            PreviousValuesList = {entity.AirHumidities.OrderByDescending(humidity => humidity.Id).Take(number ?? int.MaxValue).Select(humidity => humidity.Value ?? 0)}
+            Value = airHumidities.FirstOrDefault()?.Value ?? 0,
+            PreviousValuesList = { airHumidities.Select(h => h.Value ?? 0) }
         };
-        
+
         response.CurrentSoilHumidity = new SoilHumidityResponse
         {
-            Value = entity.SoilHumidities.LastOrDefault()?.Value ?? 0,
-            PreviousValuesList = {entity.SoilHumidities.OrderByDescending(soilHumidity => soilHumidity.Id).Take(number ?? int.MaxValue).Select(soilHumidity => soilHumidity.Value ?? 0)}
+            Value = soilHumidities.FirstOrDefault()?.Value ?? 0,
+            PreviousValuesList = { soilHumidities.Select(s => s.Value ?? 0) }
         };
-        
+
         response.CurrentLightIntensity = new LightIntensityResponse
         {
-            Value = entity.LightIntensities.LastOrDefault()?.Value ?? 0,
-            PreviousValuesList = {entity.LightIntensities.OrderByDescending(light => light.Id).Take(number ?? int.MaxValue).Select(light => light.Value ?? 0)}
+            Value = lightIntensities.FirstOrDefault()?.Value ?? 0,
+            PreviousValuesList = { lightIntensities.Select(l => l.Value ?? 0) }
         };
-        
+
         return response;
     }
 }

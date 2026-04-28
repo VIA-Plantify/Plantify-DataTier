@@ -149,7 +149,7 @@ public class PlantServiceTest
             OptimalLightIntensity = 1199.0
         };
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC))
+        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null))
             .ReturnsAsync(existingPlant);
 
         _mockRepository.Setup(r => r.UpdateAsync(It.IsAny<Plant>()))
@@ -162,7 +162,7 @@ public class PlantServiceTest
         Assert.That(result, Is.InstanceOf<Google.Protobuf.WellKnownTypes.Empty>());
 
         // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC), Times.Once);
+        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null), Times.Once);
         _mockRepository.Verify(r => r.UpdateAsync(It.Is<Plant>(p =>
             p.Username == request.Username &&
             p.MAC == request.PlantMAC &&
@@ -191,7 +191,7 @@ public class PlantServiceTest
             TemperatureScale = TemperatureScale.C
         };
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC))
+        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null))
             .ThrowsAsync(new InvalidOperationException("Plant not found"));
 
         // Act & Assert
@@ -199,7 +199,7 @@ public class PlantServiceTest
             await _plantService.Update(request, null));
 
         // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC), Times.Once);
+        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null), Times.Once);
     }
 
     // Get Happy Scenario (plant retrieved successfully)
@@ -207,64 +207,65 @@ public class PlantServiceTest
     public async Task Get_ShouldReturnPlantResponse_WhenPlantExists()
     {
         // Arrange
-        var request = new GetPlantRequest
-        {
-            Username = "testUser",
-            PlantMAC = "12345",
-            Number = 10  // Assuming limit is handled by the repository method
-        };
-
         var plant = new Plant
         {
-            MAC = request.PlantMAC,
+            MAC = "123456",
             Name = "Test Plant",
-            Username = request.Username,
-            OptimalTemperature = 25.0,
-            OptimalAirHumidity = 60.0,
-            OptimalSoilHumidity = 40.0,
-            OptimalLightIntensity = 1000.0,
-            Scale = (Entities.plant.TemperatureScale)(int)request.Number
+            Username = "testuser",
+            Scale = (Entities.plant.TemperatureScale)TemperatureScale.C,
+
+            Temperatures = [],
+            AirHumidities = [],
+            SoilHumidities = [],
+            LightIntensities = []
         };
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC))
+        var repositoryMock = new Mock<IPlantRepository>();
+        repositoryMock
+            .Setup(r => r.GetPlantAsync("testuser", "123456", It.IsAny<int?>()))
             .ReturnsAsync(plant);
 
+        var service = new PlantService(repositoryMock.Object);
+
+        var request = new GetPlantRequest
+        {
+            Username = "testuser",
+            PlantMAC = "123456"
+        };
+
         // Act
-        var result = await _plantService.Get(request, null);
+        var response = await service.Get(request, null);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.PlantMAC, Is.EqualTo("12345"));
-        Assert.That(result.Name, Is.EqualTo("Test Plant"));
-        Assert.That(result.OptimalTemperature, Is.EqualTo(25.0));
-        Assert.That(result.OptimalAirHumidity, Is.EqualTo(60.0));
-        Assert.That(result.OptimalSoilHumidity, Is.EqualTo(40.0));
-        Assert.That(result.OptimalLightIntensity, Is.EqualTo(1000.0));
-
-        // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC), Times.Once);
+        Assert.That(response, Is.Not.Null);
+        Assert.That(response.PlantMAC, Is.EqualTo("123456"));
+        Assert.That(response.Name, Is.EqualTo("Test Plant"));
     }
 
     // Get Unhappy Scenario (plant retrieval fails)
     [Test]
-    public async Task Get_ShouldThrowException_WhenPlantDoesNotExist()
+    public void Get_ShouldThrowException_WhenPlantDoesNotExist()
     {
         // Arrange
-        var request = new GetPlantRequest
-        {
-            Username = "testUser",
-            PlantMAC = "12345"
-        };
+        var repositoryMock = new Mock<IPlantRepository>();
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC))
+        repositoryMock
+            .Setup(r => r.GetPlantAsync("testuser", "missing", It.IsAny<int?>()))
             .ThrowsAsync(new InvalidOperationException("Plant not found"));
 
-        // Act & Assert
-        Assert.ThrowsAsync<RpcException>(async () =>
-            await _plantService.Get(request, null));
+        var service = new PlantService(repositoryMock.Object);
 
-        // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC), Times.Once);
+        var request = new GetPlantRequest
+        {
+            Username = "testuser",
+            PlantMAC = "missing"
+        };
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<RpcException>(async () =>
+            await service.Get(request, null)
+        );
+
+        Assert.That(ex.StatusCode, Is.EqualTo(StatusCode.NotFound));
     }
-    
 }

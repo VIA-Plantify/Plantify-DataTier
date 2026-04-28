@@ -73,7 +73,7 @@ public class PlantRepositoryTest
         await _plantRepository.CreateAsync(plant);
 
         // Act
-        var retrievedPlant = await _plantRepository.GetPlantAsync("testuser", "123456");
+        var retrievedPlant = await _plantRepository.GetPlantAsync("testuser", "123456", null);
 
         // Assert
         Assert.That(retrievedPlant, Is.Not.Null);
@@ -188,7 +188,7 @@ public class PlantRepositoryTest
         // Act & Assert
         var exception =  Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await _plantRepository.GetPlantAsync("testuser", nonExistentMAC);
+            await _plantRepository.GetPlantAsync("testuser", nonExistentMAC, null);
         });
 
         Assert.That(exception.Message, Is.EqualTo($"Plant with MAC '{nonExistentMAC}' for user 'testuser' not found."));
@@ -249,12 +249,62 @@ public class PlantRepositoryTest
         await _plantRepository.CreateAsync(plant2);
 
         // Act
-        var plants = _plantRepository.GetMany("testuser").ToList();
+        var plants = await _plantRepository.GetMany("testuser", null).ToListAsync();
 
         // Assert
         Assert.That(plants, Has.Count.EqualTo(2));
         Assert.That(plants.Any(p => p.MAC == "123456" && p.Name == "Test Plant 1"), Is.True);
         Assert.That(plants.Any(p => p.MAC == "654321" && p.Name == "Test Plant 2"), Is.True);
+    }
+    [Test]
+    public async Task GetPlantAsync_ShouldLimitReadings_WhenNumberProvided()
+    {
+        var plant = new Plant
+        {
+            MAC = "123456",
+            Name = "Test Plant",
+            Username = "testuser",
+            Temperatures = Enumerable.Range(1, 20)
+                .Select(i => new Temperature { Value = i })
+                .ToList(),
+            AirHumidities = Enumerable.Range(1, 20)
+                .Select(i => new AirHumidity { Value = i })
+                .ToList(),
+            SoilHumidities = Enumerable.Range(1, 20)
+                .Select(i => new SoilHumidity { Value = i })
+                .ToList(),
+            LightIntensities = Enumerable.Range(1, 20)
+                .Select(i => new LightIntensity { Value = i })
+                .ToList()
+        };
+
+        await _plantRepository.CreateAsync(plant);
+
+        var result = await _plantRepository.GetPlantAsync("testuser", "123456", 5);
+
+        Assert.That(result.Temperatures, Has.Count.EqualTo(5));
+        Assert.That(result.AirHumidities, Has.Count.EqualTo(5));
+        Assert.That(result.SoilHumidities, Has.Count.EqualTo(5));
+        Assert.That(result.LightIntensities, Has.Count.EqualTo(5));
+    }
+    [Test]
+    public async Task GetPlantAsync_ShouldDefaultToTenReadings_WhenNumberIsNull()
+    {
+        var plant = new Plant
+        {
+            MAC = "123456",
+            Name = "Test Plant",
+            Username = "testuser",
+            Temperatures = Enumerable.Range(1, 20)
+                .Select(i => new Temperature { Value = i })
+                .ToList()
+        };
+
+        await _plantRepository.CreateAsync(plant);
+
+        var result = await _plantRepository.GetPlantAsync("testuser", "123456", null);
+
+        Assert.That(result.Temperatures, Has.Count.EqualTo(10));
     }
     
 }
