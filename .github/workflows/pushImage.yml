@@ -27,6 +27,7 @@ jobs:
           context: .
           file: ./GrpcService/Dockerfile
           push: true
-          tags: ghcr.io/via-plantify/plantify-datatier/grpcserver:latest
-                ghcr.io/via-plantify/plantify-datatier/grpcserver:${{ github.sha }}
+          tags: |
+            ghcr.io/via-plantify/plantify-datatier/grpcserver:latest
+            ghcr.io/via-plantify/plantify-datatier/grpcserver:${{ github.sha }}
                 
