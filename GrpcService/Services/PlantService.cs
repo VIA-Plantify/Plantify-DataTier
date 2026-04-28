@@ -26,7 +26,8 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
         {
             Username = request.Username,
             Name = request.Name,
-    
+            MAC = request.MAC,
+            
             OptimalTemperature = request.OptimalTemperature,
             OptimalAirHumidity = request.OptimalAirHumidity,
             OptimalSoilHumidity = request.OptimalSoilHumidity,
