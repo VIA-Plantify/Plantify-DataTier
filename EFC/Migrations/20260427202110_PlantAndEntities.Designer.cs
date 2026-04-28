@@ -2,6 +2,7 @@
 using EFC.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFC.Migrations
 {
     [DbContext(typeof(PlantifyContext))]
-    partial class PlantifyContextModelSnapshot : ModelSnapshot
+    [Migration("20260427202110_PlantAndEntities")]
+    partial class PlantAndEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,17 +108,11 @@ namespace EFC.Migrations
                     b.Property<double>("OptimalLightIntensity")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("OptimalLightPeriod")
-                        .HasColumnType("bigint");
-
                     b.Property<double>("OptimalSoilHumidity")
                         .HasColumnType("double precision");
 
                     b.Property<double>("OptimalTemperature")
                         .HasColumnType("double precision");
-
-                    b.Property<int>("Scale")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
