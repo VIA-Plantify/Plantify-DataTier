@@ -5,7 +5,7 @@ using GrpcService.Services;
 using Moq;
 using RepositoryContracts;
 
-namespace UnitTests;
+namespace UnitTests.Services;
 
 [TestFixture]
 public class AuthServiceTest

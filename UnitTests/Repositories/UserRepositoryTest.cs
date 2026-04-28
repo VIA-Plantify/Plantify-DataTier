@@ -4,7 +4,7 @@ using NUnit.Framework;
 using EFC.Repositories;
 using EFC.DataAccess;
 
-namespace UnitTests
+namespace UnitTests.Repositories
 {
     [TestFixture]
     public class UserRepositoryEfcTests

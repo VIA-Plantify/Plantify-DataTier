@@ -14,3 +14,5 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:10081
     user: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

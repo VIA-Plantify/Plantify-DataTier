@@ -2,13 +2,13 @@ name: plantify_production
 
 services:
   grpcserver:
-    image: grpcserverdata:latest
-    container_name: grpcserverdata
+    image: grpcserver:latest
+    container_name: grpcserver
     build:
       context: .
-      dockerfile: ./GrpcService/Dockerfile
+      dockerfile: ./GrpcService/Dockerfile.local
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:10081
     user: root
     depends_on:
@@ -19,7 +19,7 @@ services:
     networks:
       plantify-network:
         aliases:
-          - grpcserverdata
+          - grpcserver
   postgres:
     image: postgres:17-alpine
     environment:
