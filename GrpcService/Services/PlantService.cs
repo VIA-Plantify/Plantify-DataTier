@@ -67,7 +67,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     {
         try
         {
-            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, request.Number);
+            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, request.NumberOfReadings);
             return MapToPlantResponse(plant);
         }
         catch (InvalidOperationException ex)
@@ -86,7 +86,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     public async override Task<GetManyPlantResponse> GetPlantsByUsername(GetPlantsByUsernameRequest request,
         ServerCallContext context)
     {
-        var plants = repository.GetMany(request.Username, request.Number);
+        var plants = repository.GetMany(request.Username, request.NumberOfReadings);
         var response = new GetManyPlantResponse();
         foreach (var plant in await plants.ToListAsync())
         {
@@ -130,6 +130,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     {
         return new PlantResponse
         {
+            Username = entity.Username,
             OptimalTemperature = entity.OptimalTemperature,
             OptimalAirHumidity = entity.OptimalAirHumidity,
             OptimalSoilHumidity = entity.OptimalSoilHumidity,
