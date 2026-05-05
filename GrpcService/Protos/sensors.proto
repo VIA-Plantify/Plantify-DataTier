@@ -4,6 +4,7 @@ option csharp_namespace = "GrpcService";
 
 package sensors;
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 message SensorResponse {
    double SoilHumidity = 1;
@@ -12,6 +13,7 @@ message SensorResponse {
    double Temperature = 4;
    string plantMAC = 5;
    int64 Id = 6;
+   google.protobuf.Timestamp Timestamp = 7;
 }
 message CreateSensorDataRequest{
   double SoilHumidity = 1;
@@ -19,6 +21,7 @@ message CreateSensorDataRequest{
   double AirHumidity = 3;
   double Temperature = 4;
   string plantMAC = 5;
+  google.protobuf.Timestamp TimeStamp = 6;
 }
 message GetLatestSensorDataRequest{
   string plantMac = 1;
@@ -29,6 +32,7 @@ message PreviousSensorResponses{
   repeated double PreviousAirHumidity = 3;
   repeated double PreviousTemperature = 4;
   string plantMAC = 5;
+  repeated google.protobuf.Timestamp TimeStamp = 6;
 }
 service SensorServiceProto {
   rpc Create(CreateSensorDataRequest) returns (google.protobuf.Empty);

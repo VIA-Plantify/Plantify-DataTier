@@ -151,43 +151,29 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>A PlantResponse object representing the mapped plant data.</returns>
     private PlantResponse MapToPlantResponse(Plant entity)
     {
-        //TODO fix this
 
-        /*var temperatures = entity.Temperatures ?? [];
-        var airHumidities = entity.AirHumidities ?? [];
-        var soilHumidities = entity.SoilHumidities ?? [];
-        var lightIntensities = entity.LightIntensities ?? [];*/
+        var sensorDatas = entity.SensorDatas ?? [];
+        var wateringDatas = entity.Waterings ?? [];
+        
 
-        /*var response = MapToOptimalConfiguration(entity);
+        var response = MapToOptimalConfiguration(entity);
         response.PlantMAC = entity.MAC;
         response.Name = entity.Name;
         response.TemperatureScale = (TemperatureScale)entity.Scale;
+        
+        var latest = sensorDatas.OrderByDescending(s => s.Timestamp).FirstOrDefault();
 
-        response.CurrentTemperature = new TemperatureResponse
+        response.SensorData = new SensorResponse()
         {
-            Value = temperatures.FirstOrDefault()?.Value ?? 0,
-            PreviousValuesList = { temperatures.Select(t => t.Value ?? 0) }
+            Temperature = latest?.Temperature ?? 0,
+            AirHumidity = latest?.AirHumidity ?? 0,
+            Id = latest?.Id ?? 0,
+            LightIntensity = latest?.LightIntensity ?? 0,
+            SoilHumidity = latest?.SoilHumidity ?? 0,
+            PlantMAC = latest?.PlantMAC ?? string.Empty,
+            Timestamp =Timestamp.FromDateTime(latest?.Timestamp ?? DateTime.MinValue),
         };
 
-        response.CurrentAirHumidity = new AirHumidityResponse
-        {
-            Value = airHumidities.FirstOrDefault()?.Value ?? 0,
-            PreviousValuesList = { airHumidities.Select(h => h.Value ?? 0) }
-        };
-
-        response.CurrentSoilHumidity = new SoilHumidityResponse
-        {
-            Value = soilHumidities.FirstOrDefault()?.Value ?? 0,
-            PreviousValuesList = { soilHumidities.Select(s => s.Value ?? 0) }
-        };
-
-        response.CurrentLightIntensity = new LightIntensityResponse
-        {
-            Value = lightIntensities.FirstOrDefault()?.Value ?? 0,
-            PreviousValuesList = { lightIntensities.Select(l => l.Value ?? 0) }
-        };
-
-        return response;*/
-        throw new NotImplementedException();
+        return response;
     }
 }
