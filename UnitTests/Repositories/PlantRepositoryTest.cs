@@ -256,9 +256,8 @@ public class PlantRepositoryTest
         Assert.That(plants.Any(p => p.MAC == "123456" && p.Name == "Test Plant 1"), Is.True);
         Assert.That(plants.Any(p => p.MAC == "654321" && p.Name == "Test Plant 2"), Is.True);
     }
-    //TODO
-    //FIX TEST
-    /*[Test]
+    
+   [Test]
     public async Task GetPlantAsync_ShouldLimitReadings_WhenNumberProvided()
     {
         var plant = new Plant
@@ -266,28 +265,22 @@ public class PlantRepositoryTest
             MAC = "123456",
             Name = "Test Plant",
             Username = "testuser",
-            Temperatures = Enumerable.Range(1, 20)
-                .Select(i => new Temperature { Value = i })
+            SensorDatas = Enumerable.Range(1, 20)
+                .Select(i => new SensorData() { Temperature = i, AirHumidity = i, LightIntensity = i, SoilHumidity = i, Timestamp = DateTime.Now})
                 .ToList(),
-            AirHumidities = Enumerable.Range(1, 20)
-                .Select(i => new AirHumidity { Value = i })
+            Waterings = Enumerable.Range(1, 20)
+                .Select(i => new Watering() {PumpTimeInSeconds = i })
                 .ToList(),
-            SoilHumidities = Enumerable.Range(1, 20)
-                .Select(i => new SoilHumidity { Value = i })
-                .ToList(),
-            LightIntensities = Enumerable.Range(1, 20)
-                .Select(i => new LightIntensity { Value = i })
-                .ToList()
+           
         };
 
         await _plantRepository.CreateAsync(plant);
 
-        var result = await _plantRepository.GetPlantAsync("testuser", "123456", 5);
+        var result = await _plantRepository.GetPlantAsync("testuser", "123456", 5,5);
 
-        Assert.That(result.Temperatures, Has.Count.EqualTo(5));
-        Assert.That(result.AirHumidities, Has.Count.EqualTo(5));
-        Assert.That(result.SoilHumidities, Has.Count.EqualTo(5));
-        Assert.That(result.LightIntensities, Has.Count.EqualTo(5));
+        Assert.That(result.SensorDatas, Has.Count.EqualTo(5));
+        Assert.That(result.Waterings, Has.Count.EqualTo(5));
+        
     }
     [Test]
     public async Task GetPlantAsync_ShouldDefaultToTenReadings_WhenNumberIsNull()
@@ -297,17 +290,21 @@ public class PlantRepositoryTest
             MAC = "123456",
             Name = "Test Plant",
             Username = "testuser",
-            Temperatures = Enumerable.Range(1, 20)
-                .Select(i => new Temperature { Value = i })
-                .ToList()
+            SensorDatas = Enumerable.Range(1, 20)
+                .Select(i => new SensorData() { Temperature = i, AirHumidity = i, LightIntensity = i, SoilHumidity = i, Timestamp = DateTime.Now})
+                .ToList(),
+            Waterings = Enumerable.Range(1, 20)
+                .Select(i => new Watering() {PumpTimeInSeconds = i })
+                .ToList(),
         };
 
         await _plantRepository.CreateAsync(plant);
 
-        var result = await _plantRepository.GetPlantAsync("testuser", "123456", null);
+        var result = await _plantRepository.GetPlantAsync("testuser", "123456", null,null);
 
-        Assert.That(result.Temperatures, Has.Count.EqualTo(10));
+        Assert.That(result.SensorDatas, Has.Count.EqualTo(10));
+        Assert.That(result.Waterings, Has.Count.EqualTo(1));
     }
-    */
+    
     
 }

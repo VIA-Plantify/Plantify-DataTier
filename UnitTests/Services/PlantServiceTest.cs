@@ -206,8 +206,8 @@ public class PlantServiceTest
     [Test]
     public async Task Get_ShouldReturnPlantResponse_WhenPlantExists()
     {
-        //TODO FIX TEST
-        /*// Arrange
+        
+        // Arrange
         var plant = new Plant
         {
             MAC = "123456",
@@ -215,15 +215,14 @@ public class PlantServiceTest
             Username = "testuser",
             Scale = (Entities.plant.TemperatureScale)TemperatureScale.C,
 
-            Temperatures = [],
-            AirHumidities = [],
-            SoilHumidities = [],
-            LightIntensities = []
+            SensorDatas = [],
+            Waterings = [],
+   
         };
 
         var repositoryMock = new Mock<IPlantRepository>();
         repositoryMock
-            .Setup(r => r.GetPlantAsync("testuser", "123456", It.IsAny<int?>()))
+            .Setup(r => r.GetPlantAsync("testuser", "123456", It.IsAny<int?>(),It.IsAny<int?>()))
             .ReturnsAsync(plant);
 
         var service = new PlantService(repositoryMock.Object);
@@ -240,7 +239,7 @@ public class PlantServiceTest
         // Assert
         Assert.That(response, Is.Not.Null);
         Assert.That(response.PlantMAC, Is.EqualTo("123456"));
-        Assert.That(response.Name, Is.EqualTo("Test Plant"));*/
+        Assert.That(response.Name, Is.EqualTo("Test Plant"));
     }
 
     // Get Unhappy Scenario (plant retrieval fails)
