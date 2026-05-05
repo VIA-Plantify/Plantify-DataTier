@@ -56,3 +56,5 @@ nunit-*.xml
 
 # Env
 *.env
+
+Plantify-DataTier.sln.DotSettings.user
