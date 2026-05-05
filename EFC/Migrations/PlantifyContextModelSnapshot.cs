@@ -109,6 +109,9 @@ namespace EFC.Migrations
                     b.Property<double>("Temperature")
                         .HasColumnType("double precision");
 
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PlantMAC");
@@ -124,21 +127,21 @@ namespace EFC.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("LastWaterTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PlantMAC")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("PredictedWaterTime")
+                    b.Property<DateTime>("PredictedFutureWaterTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("PumpTime")
-                        .HasColumnType("double precision");
+                    b.Property<int>("PumpTimeInSeconds")
+                        .HasColumnType("integer");
 
                     b.Property<double>("WaterLevel")
                         .HasColumnType("double precision");
-
-                    b.Property<DateTime>("WaterTime")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

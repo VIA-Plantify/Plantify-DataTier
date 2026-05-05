@@ -43,7 +43,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <param name="plantMAC">The MAC address of the plant.</param>
     /// <param name="number">Number of reading that should be send with the plant</param>
     /// <returns>A task representing the asynchronous operation that returns the Plant object if found; otherwise, throws an InvalidOperationException.</returns>
-    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? number)
+    public Task<Plant> GetPlantAsync(string username, string plantMAC, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
         //TODO FIX THIS
         /*var take = number is null or 0 ? 10 : number.Value;
@@ -126,7 +126,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// </summary>
     /// <param name="username">The username of the owner of the plants.</param>
     /// <returns>An IQueryable collection of Plant objects that match the given username.</returns>
-    public IQueryable<Plant> GetMany(string username, int? number)
+    public IQueryable<Plant> GetMany(string username, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
         //TODO FIX THIS
         /*var take = number is null or 0 ? 10 : number.Value;

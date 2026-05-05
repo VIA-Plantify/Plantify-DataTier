@@ -27,14 +27,14 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
             Username = request.Username,
             Name = request.Name,
             MAC = request.MAC,
-            
+
             OptimalTemperature = request.OptimalTemperature,
             OptimalAirHumidity = request.OptimalAirHumidity,
             OptimalSoilHumidity = request.OptimalSoilHumidity,
             OptimalLightIntensity = request.OptimalLightIntensity,
             Scale = (Entities.plant.TemperatureScale)(int)request.TemperatureScale
         };
-    
+
         try
         {
             var createdPlant = await repository.CreateAsync(plant);
@@ -54,8 +54,8 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>A Task that completes when the deletion operation is finished. The return type is Empty, indicating no value is returned.</returns>
     public async override Task<Empty> Delete(DeletePlantRequest request, ServerCallContext context)
     {
-            await repository.DeleteAsync(request.Username, request.PlantMAC);
-            return new Empty();
+        await repository.DeleteAsync(request.Username, request.PlantMAC);
+        return new Empty();
     }
 
     /// <summary>
@@ -68,7 +68,8 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     {
         try
         {
-            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, request.NumberOfReadings);
+            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC,
+                request.NumberOfSensorReadings, request.NumberOfWateringReadings);
             return MapToPlantResponse(plant);
         }
         catch (InvalidOperationException ex)
@@ -87,12 +88,13 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     public async override Task<GetManyPlantResponse> GetPlantsByUsername(GetPlantsByUsernameRequest request,
         ServerCallContext context)
     {
-        var plants = repository.GetMany(request.Username, request.NumberOfReadings);
+        var plants = repository.GetMany(request.Username, request.NumberOfReadings, null);
         var response = new GetManyPlantResponse();
         foreach (var plant in await plants.ToListAsync())
         {
             response.Plants.Add(MapToPlantResponse(plant));
         }
+
         return response;
     }
 
@@ -104,20 +106,21 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>An empty response indicating successful update.</returns>
     public async override Task<Empty> Update(UpdatePlantRequest request, ServerCallContext context)
     {
-        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, number: null);
-    
+        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, numberOfSensorReadings: null,
+            numberOfWateringReadings: null);
+
         if (plant == null)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "Plant not found"));
         }
-    
+
         plant.Name = request.Name;
         plant.OptimalTemperature = request.OptimalTemperature;
         plant.OptimalAirHumidity = request.OptimalAirHumidity;
         plant.OptimalSoilHumidity = request.OptimalSoilHumidity;
         plant.OptimalLightIntensity = request.OptimalLightIntensity;
         plant.Scale = (Entities.plant.TemperatureScale)(int)request.TemperatureScale;
-    
+
         await repository.UpdateAsync(plant);
         return new Empty();
     }
@@ -149,7 +152,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     private PlantResponse MapToPlantResponse(Plant entity)
     {
         //TODO fix this
-        
+
         /*var temperatures = entity.Temperatures ?? [];
         var airHumidities = entity.AirHumidities ?? [];
         var soilHumidities = entity.SoilHumidities ?? [];
