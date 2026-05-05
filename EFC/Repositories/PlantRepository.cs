@@ -45,7 +45,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <returns>A task representing the asynchronous operation that returns the Plant object if found; otherwise, throws an InvalidOperationException.</returns>
     public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? number)
     {
-        var take = number is null or 0 ? 10 : number.Value;
+        //TODO FIX THIS
+        /*var take = number is null or 0 ? 10 : number.Value;
         //TODO depending on water intake remove this todo or add the code to get water intakes
         var plant = await context.Plants.Where(p => p.Username == username && p.MAC == plantMAC)
             .Select(p => new Plant()
@@ -74,7 +75,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
             throw new InvalidOperationException($"Plant with MAC '{plantMAC}' for user '{username}' not found.");
         }
 
-        return plant;
+        return plant;*/
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -126,7 +128,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <returns>An IQueryable collection of Plant objects that match the given username.</returns>
     public IQueryable<Plant> GetMany(string username, int? number)
     {
-        var take = number is null or 0 ? 10 : number.Value;
+        //TODO FIX THIS
+        /*var take = number is null or 0 ? 10 : number.Value;
 
         return context.Plants
             .Where(p => p.Username == username)
@@ -161,6 +164,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                     .OrderByDescending(r => r.Id)
                     .Take(take)
                     .ToList(),
-            });
+            });*/
+        throw new NotImplementedException();
     }
 }

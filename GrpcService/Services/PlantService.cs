@@ -148,12 +148,14 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>A PlantResponse object representing the mapped plant data.</returns>
     private PlantResponse MapToPlantResponse(Plant entity)
     {
-        var temperatures = entity.Temperatures ?? [];
+        //TODO fix this
+        
+        /*var temperatures = entity.Temperatures ?? [];
         var airHumidities = entity.AirHumidities ?? [];
         var soilHumidities = entity.SoilHumidities ?? [];
-        var lightIntensities = entity.LightIntensities ?? [];
+        var lightIntensities = entity.LightIntensities ?? [];*/
 
-        var response = MapToOptimalConfiguration(entity);
+        /*var response = MapToOptimalConfiguration(entity);
         response.PlantMAC = entity.MAC;
         response.Name = entity.Name;
         response.TemperatureScale = (TemperatureScale)entity.Scale;
@@ -182,6 +184,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
             PreviousValuesList = { lightIntensities.Select(l => l.Value ?? 0) }
         };
 
-        return response;
+        return response;*/
+        throw new NotImplementedException();
     }
 }
