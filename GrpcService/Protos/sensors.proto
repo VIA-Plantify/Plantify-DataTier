@@ -21,7 +21,7 @@ message CreateSensorDataRequest{
   double AirHumidity = 3;
   double Temperature = 4;
   string plantMAC = 5;
-  google.protobuf.Timestamp TimeStamp = 6;
+  google.protobuf.Timestamp Timestamp = 6;
 }
 message GetLatestSensorDataRequest{
   string plantMac = 1;
@@ -32,7 +32,7 @@ message PreviousSensorResponses{
   repeated double PreviousAirHumidity = 3;
   repeated double PreviousTemperature = 4;
   string plantMAC = 5;
-  repeated google.protobuf.Timestamp TimeStamp = 6;
+  repeated google.protobuf.Timestamp Timestamp = 6;
 }
 service SensorServiceProto {
   rpc Create(CreateSensorDataRequest) returns (google.protobuf.Empty);
