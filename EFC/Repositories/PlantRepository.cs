@@ -45,9 +45,10 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <returns>A task representing the asynchronous operation that returns the Plant object if found; otherwise, throws an InvalidOperationException.</returns>
     public Task<Plant> GetPlantAsync(string username, string plantMAC, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
-        //TODO FIX THIS
-        /*var take = number is null or 0 ? 10 : number.Value;
-        //TODO depending on water intake remove this todo or add the code to get water intakes
+        
+        var take = numberOfSensorReadings is null or 0 ? 10 : numberOfSensorReadings.Value;
+        var wateringTake = numberOfWateringReadings is null or 0 ? 10 : numberOfWateringReadings.Value;
+
         var plant = await context.Plants.Where(p => p.Username == username && p.MAC == plantMAC)
             .Select(p => new Plant()
             {
@@ -60,7 +61,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 OptimalLightPeriod = p.OptimalLightPeriod,
-                
+            
                 Temperatures = p.Temperatures.OrderByDescending(r => r.Id)
                     .Take(take).ToList(),
                 SoilHumidities = p.SoilHumidities.OrderByDescending(r => r.Id)
@@ -69,14 +70,16 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                     .Take(take).ToList(),
                 LightIntensities = p.LightIntensities.OrderByDescending(r => r.Id)
                     .Take(take).ToList(),
+                WaterIntakes = p.WaterIntakes.OrderByDescending(r => r.Id)
+                    .Take(wateringTake).ToList(),
             }).FirstOrDefaultAsync();
+        
         if (plant == null)
         {
             throw new InvalidOperationException($"Plant with MAC '{plantMAC}' for user '{username}' not found.");
         }
 
-        return plant;*/
-        throw new NotImplementedException();
+        return plant;
     }
 
     /// <summary>
@@ -128,8 +131,9 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <returns>An IQueryable collection of Plant objects that match the given username.</returns>
     public IQueryable<Plant> GetMany(string username, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
-        //TODO FIX THIS
-        /*var take = number is null or 0 ? 10 : number.Value;
+        
+        var take = numberOfSensorReadings is null or 0 ? 10 : numberOfSensorReadings.Value;
+        var wateringTake = numberOfWateringReadings is null or 0 ? 10 : numberOfWateringReadings.Value;
 
         return context.Plants
             .Where(p => p.Username == username)
@@ -144,27 +148,12 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 OptimalLightPeriod = p.OptimalLightPeriod,
-                
-                Temperatures = p.Temperatures
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
 
-                SoilHumidities = p.SoilHumidities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-
-                AirHumidities = p.AirHumidities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-
-                LightIntensities = p.LightIntensities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-            });*/
-        throw new NotImplementedException();
+                Temperatures = p.Temperatures.OrderByDescending(r => r.Id).Take(take).ToList(),
+                SoilHumidities = p.SoilHumidities.OrderByDescending(r => r.Id).Take(take).ToList(),
+                AirHumidities = p.AirHumidities.OrderByDescending(r => r.Id).Take(take).ToList(),
+                LightIntensities = p.LightIntensities.OrderByDescending(r => r.Id).Take(take).ToList(),
+                WaterIntakes = p.WaterIntakes.OrderByDescending(r => r.Id).Take(wateringTake).ToList(),
+            });
     }
 }
