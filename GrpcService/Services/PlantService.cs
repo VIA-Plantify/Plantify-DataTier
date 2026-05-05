@@ -171,7 +171,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
             LightIntensity = latest?.LightIntensity ?? 0,
             SoilHumidity = latest?.SoilHumidity ?? 0,
             PlantMAC = latest?.PlantMAC ?? string.Empty,
-            Timestamp =Timestamp.FromDateTime(latest?.Timestamp ?? DateTime.MinValue),
+            Timestamp =Timestamp.FromDateTime(latest?.Timestamp.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime()),
         };
 
         return response;
