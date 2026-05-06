@@ -19,7 +19,6 @@ public class Plant
     public double OptimalSoilHumidity { get; set; }
     public double OptimalLightIntensity { get; set; }
     
-    public long OptimalLightPeriod {get; set;}
     
     //FOR EFC
     public ICollection<Watering> Waterings { get; set; } = new List<Watering>();

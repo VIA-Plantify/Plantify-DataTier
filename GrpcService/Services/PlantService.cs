@@ -139,7 +139,6 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
             OptimalAirHumidity = entity.OptimalAirHumidity,
             OptimalSoilHumidity = entity.OptimalSoilHumidity,
             OptimalLightIntensity = entity.OptimalLightIntensity,
-            OptimalLightPeriodSeconds = entity.OptimalLightPeriod,
             TemperatureScale = (TemperatureScale)entity.Scale
         };
     }

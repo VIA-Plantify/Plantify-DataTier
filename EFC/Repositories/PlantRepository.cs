@@ -60,7 +60,6 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalTemperature = p.OptimalTemperature,
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
-                OptimalLightPeriod = p.OptimalLightPeriod,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 
                 SensorDatas = p.SensorDatas
@@ -144,7 +143,6 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
-                OptimalLightPeriod = p.OptimalLightPeriod,
                 
                 SensorDatas = p.SensorDatas.Take(take).ToList(),
                 Waterings = p.Waterings.Take(wateringTake).ToList()
