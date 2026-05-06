@@ -88,7 +88,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     public async override Task<GetManyPlantResponse> GetPlantsByUsername(GetPlantsByUsernameRequest request,
         ServerCallContext context)
     {
-        var plants = repository.GetMany(request.Username, request.NumberOfReadings, null);
+        var plants = repository.GetMany(request.Username, request.NumberOfReadings, request.NumberOfWateringReadings);
         var response = new GetManyPlantResponse();
         foreach (var plant in await plants.ToListAsync())
         {
