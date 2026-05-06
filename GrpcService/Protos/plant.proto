@@ -30,6 +30,7 @@ message CreatePlantRequest {
 message GetPlantsByUsernameRequest {
   string username = 1;
   int32 numberOfReadings = 2;
+  int32 numberOfWateringReadings = 3;
 }
 
 message GetPlantRequest {
