@@ -45,12 +45,13 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// <param name="numberOfWateringReadings">Optional. The number of latest watering records to include. Defaults to 1 if not provided or zero.</param>
     /// <returns>A task representing the asynchronous operation that returns the retrieved Plant object.</returns>
     /// <exception cref="InvalidOperationException">Thrown when a plant with the specified MAC address for the given user is not found.</exception>
-    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? numberOfSensorReadings, int? numberOfWateringReadings)
+    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? numberOfSensorReadings,
+        int? numberOfWateringReadings)
     {
         var take = numberOfSensorReadings is null or 0 ? 10 : numberOfSensorReadings.Value;
         var wateringTake = numberOfWateringReadings is null or 0 ? 1 : numberOfWateringReadings.Value;
-        
-        var plant = await context.Plants.Where(p =>  p.Username == username && p.MAC == plantMAC).Select(p=>
+
+        var plant = await context.Plants.Where(p => p.Username == username && p.MAC == plantMAC).Select(p =>
             new Plant()
             {
                 MAC = p.MAC,
@@ -61,7 +62,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
-                
+
                 SensorDatas = p.SensorDatas
                     .OrderByDescending(s => s.Id)
                     .Take(take)
@@ -72,7 +73,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                     .Take(wateringTake)
                     .ToList()
             }).FirstOrDefaultAsync();
-        
+
         if (plant == null)
         {
             throw new InvalidOperationException($"Plant with MAC '{plantMAC}' for user '{username}' not found.");
@@ -134,30 +135,30 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
         var wateringTake = numberOfWateringReadings is null or 0 ? 1 : numberOfWateringReadings.Value;
 
         return context.Plants.Where(p => p.Username == username).Select(p => new Plant
-            {
-                MAC = p.MAC,
-                Username = p.Username,
-                Name = p.Name,
-                Scale = p.Scale,
-                OptimalTemperature = p.OptimalTemperature,
-                OptimalAirHumidity = p.OptimalAirHumidity,
-                OptimalSoilHumidity = p.OptimalSoilHumidity,
-                OptimalLightIntensity = p.OptimalLightIntensity,
-                
-                SensorDatas = p.SensorDatas
-                    .OrderByDescending(s => s.Id)
-                    .Take(take)
-                    .ToList(),
+        {
+            MAC = p.MAC,
+            Username = p.Username,
+            Name = p.Name,
+            Scale = p.Scale,
+            OptimalTemperature = p.OptimalTemperature,
+            OptimalAirHumidity = p.OptimalAirHumidity,
+            OptimalSoilHumidity = p.OptimalSoilHumidity,
+            OptimalLightIntensity = p.OptimalLightIntensity,
 
-                Waterings = p.Waterings
-                    .OrderByDescending(w => w.Id)
-                    .Take(wateringTake)
-                    .ToList()
-            });
+            SensorDatas = p.SensorDatas
+                .OrderByDescending(s => s.Id)
+                .Take(take)
+                .ToList(),
+
+            Waterings = p.Waterings
+                .OrderByDescending(w => w.Id)
+                .Take(wateringTake)
+                .ToList()
+        });
     }
 
     public IQueryable<Plant> GetAllPlants()
     {
-        return context.Plants;
+        return context.Plants.Include(p => p.SensorDatas).Include(p => p.Waterings);
     }
 }
