@@ -3,6 +3,7 @@ using System;
 using EFC.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFC.Migrations
 {
     [DbContext(typeof(PlantifyContext))]
-    partial class PlantifyContextModelSnapshot : ModelSnapshot
+    [Migration("20260505091953_SensorDataAndWatering")]
+    partial class SensorDataAndWatering
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,6 +65,9 @@ namespace EFC.Migrations
                     b.Property<double>("OptimalLightIntensity")
                         .HasColumnType("double precision");
 
+                    b.Property<long>("OptimalLightPeriod")
+                        .HasColumnType("bigint");
+
                     b.Property<double>("OptimalSoilHumidity")
                         .HasColumnType("double precision");
 
@@ -106,9 +112,6 @@ namespace EFC.Migrations
                     b.Property<double>("Temperature")
                         .HasColumnType("double precision");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PlantMAC");
@@ -124,21 +127,21 @@ namespace EFC.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("LastWaterTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("PlantMAC")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("PredictedFutureWaterTime")
+                    b.Property<DateTime>("PredictedWaterTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PumpTimeInSeconds")
-                        .HasColumnType("integer");
+                    b.Property<double>("PumpTime")
+                        .HasColumnType("double precision");
 
                     b.Property<double>("WaterLevel")
                         .HasColumnType("double precision");
+
+                    b.Property<DateTime>("WaterTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

@@ -37,38 +37,42 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     }
 
     /// <summary>
-    /// Retrieves a plant asynchronously based on the username and MAC address.
+    /// Retrieves a plant asynchronously based on the specified username and plant MAC address.
     /// </summary>
-    /// <param name="username">The username associated with the plant.</param>
-    /// <param name="plantMAC">The MAC address of the plant.</param>
-    /// <param name="number">Number of reading that should be send with the plant</param>
-    /// <returns>A task representing the asynchronous operation that returns the Plant object if found; otherwise, throws an InvalidOperationException.</returns>
-    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? number)
+    /// <param name="username">The username of the user owning the plant.</param>
+    /// <param name="plantMAC">The MAC address of the plant to retrieve.</param>
+    /// <param name="numberOfSensorReadings">Optional. The number of latest sensor readings to include. Defaults to 10 if not provided or zero.</param>
+    /// <param name="numberOfWateringReadings">Optional. The number of latest watering records to include. Defaults to 1 if not provided or zero.</param>
+    /// <returns>A task representing the asynchronous operation that returns the retrieved Plant object.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when a plant with the specified MAC address for the given user is not found.</exception>
+    public async Task<Plant> GetPlantAsync(string username, string plantMAC, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
-        var take = number is null or 0 ? 10 : number.Value;
-        //TODO depending on water intake remove this todo or add the code to get water intakes
-        var plant = await context.Plants.Where(p => p.Username == username && p.MAC == plantMAC)
-            .Select(p => new Plant()
+        var take = numberOfSensorReadings is null or 0 ? 10 : numberOfSensorReadings.Value;
+        var wateringTake = numberOfWateringReadings is null or 0 ? 1 : numberOfWateringReadings.Value;
+        
+        var plant = await context.Plants.Where(p =>  p.Username == username && p.MAC == plantMAC).Select(p=>
+            new Plant()
             {
                 MAC = p.MAC,
-                Username = p.Username,
                 Name = p.Name,
+                Username = p.Username,
                 Scale = p.Scale,
                 OptimalTemperature = p.OptimalTemperature,
                 OptimalAirHumidity = p.OptimalAirHumidity,
-                OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
-                OptimalLightPeriod = p.OptimalLightPeriod,
+                OptimalSoilHumidity = p.OptimalSoilHumidity,
                 
-                Temperatures = p.Temperatures.OrderByDescending(r => r.Id)
-                    .Take(take).ToList(),
-                SoilHumidities = p.SoilHumidities.OrderByDescending(r => r.Id)
-                    .Take(take).ToList(),
-                AirHumidities = p.AirHumidities.OrderByDescending(r => r.Id)
-                    .Take(take).ToList(),
-                LightIntensities = p.LightIntensities.OrderByDescending(r => r.Id)
-                    .Take(take).ToList(),
+                SensorDatas = p.SensorDatas
+                    .OrderByDescending(r => r.Id)
+                    .Take(take)
+                    .ToList(),
+
+                Waterings = p.Waterings
+                    .OrderByDescending(r => r.Id)
+                    .Take(wateringTake)
+                    .ToList()
             }).FirstOrDefaultAsync();
+        
         if (plant == null)
         {
             throw new InvalidOperationException($"Plant with MAC '{plantMAC}' for user '{username}' not found.");
@@ -124,13 +128,12 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
     /// </summary>
     /// <param name="username">The username of the owner of the plants.</param>
     /// <returns>An IQueryable collection of Plant objects that match the given username.</returns>
-    public IQueryable<Plant> GetMany(string username, int? number)
+    public IQueryable<Plant> GetMany(string username, int? numberOfSensorReadings, int? numberOfWateringReadings)
     {
-        var take = number is null or 0 ? 10 : number.Value;
+        var take = numberOfSensorReadings is null or 0 ? 10 : numberOfSensorReadings.Value;
+        var wateringTake = numberOfWateringReadings is null or 0 ? 1 : numberOfWateringReadings.Value;
 
-        return context.Plants
-            .Where(p => p.Username == username)
-            .Select(p => new Plant
+        return context.Plants.Where(p => p.Username == username).Select(p => new Plant
             {
                 MAC = p.MAC,
                 Username = p.Username,
@@ -140,27 +143,9 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
-                OptimalLightPeriod = p.OptimalLightPeriod,
                 
-                Temperatures = p.Temperatures
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-
-                SoilHumidities = p.SoilHumidities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-
-                AirHumidities = p.AirHumidities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
-
-                LightIntensities = p.LightIntensities
-                    .OrderByDescending(r => r.Id)
-                    .Take(take)
-                    .ToList(),
+                SensorDatas = p.SensorDatas.Take(take).ToList(),
+                Waterings = p.Waterings.Take(wateringTake).ToList()
             });
     }
 }

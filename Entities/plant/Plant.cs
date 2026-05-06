@@ -19,10 +19,9 @@ public class Plant
     public double OptimalSoilHumidity { get; set; }
     public double OptimalLightIntensity { get; set; }
     
-    public long OptimalLightPeriod {get; set;}
-    public ICollection<Temperature> Temperatures { get; set; } = new List<Temperature>();
-    public ICollection<WaterIntake> WaterIntakes { get; set; } = new List<WaterIntake>();
-    public ICollection<SoilHumidity> SoilHumidities { get; set; } = new List<SoilHumidity>();
-    public ICollection<AirHumidity> AirHumidities { get; set; } = new List<AirHumidity>();
-    public ICollection<LightIntensity> LightIntensities { get; set; } = new List<LightIntensity>();
+    
+    //FOR EFC
+    public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
+    public ICollection<SensorData> SensorDatas { get; set; } = new List<SensorData>();
+    
 }
