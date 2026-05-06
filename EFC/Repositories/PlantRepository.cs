@@ -63,12 +63,12 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 
                 SensorDatas = p.SensorDatas
-                    .OrderByDescending(r => r.Id)
+                    .OrderByDescending(s => s.Id)
                     .Take(take)
                     .ToList(),
 
                 Waterings = p.Waterings
-                    .OrderByDescending(r => r.Id)
+                    .OrderByDescending(w => w.Id)
                     .Take(wateringTake)
                     .ToList()
             }).FirstOrDefaultAsync();
@@ -144,8 +144,15 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 
-                SensorDatas = p.SensorDatas.Take(take).ToList(),
-                Waterings = p.Waterings.Take(wateringTake).ToList()
+                SensorDatas = p.SensorDatas
+                    .OrderByDescending(s => s.Id)
+                    .Take(take)
+                    .ToList(),
+
+                Waterings = p.Waterings
+                    .OrderByDescending(w => w.Id)
+                    .Take(wateringTake)
+                    .ToList()
             });
     }
 
