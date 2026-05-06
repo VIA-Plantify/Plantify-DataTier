@@ -148,4 +148,9 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 Waterings = p.Waterings.Take(wateringTake).ToList()
             });
     }
+
+    public IQueryable<Plant> GetAllPlants()
+    {
+        return context.Plants;
+    }
 }

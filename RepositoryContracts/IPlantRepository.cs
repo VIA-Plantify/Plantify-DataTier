@@ -9,4 +9,5 @@ public interface IPlantRepository
     Task DeleteAsync(string username,string plantMAC);
     Task UpdateAsync(Plant plant);
     IQueryable<Plant> GetMany(string username, int? numberOfSensorReadings, int? numberOfWateringReadings);
+    IQueryable<Plant> GetAllPlants();
 }

@@ -175,4 +175,25 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
 
         return response;
     }
+
+    public override async Task<GetManyPlantResponse> GetAllPlants(Empty request ,ServerCallContext context)
+    {
+        try
+        {
+            var plants = await repository.GetAllPlants().ToListAsync();
+            
+            var response = new GetManyPlantResponse();
+
+            foreach (var plant in plants)
+            {
+                response.Plants.Add(MapToPlantResponse(plant));
+            }
+            
+            return response;
+        }
+        catch (Exception e)
+        {
+            throw new RpcException(new Status(StatusCode.Internal, e.Message));
+        }
+    }
 }
