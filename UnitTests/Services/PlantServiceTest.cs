@@ -149,7 +149,7 @@ public class PlantServiceTest
             OptimalLightIntensity = 1199.0
         };
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null))
+        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null, null))
             .ReturnsAsync(existingPlant);
 
         _mockRepository.Setup(r => r.UpdateAsync(It.IsAny<Plant>()))
@@ -162,7 +162,7 @@ public class PlantServiceTest
         Assert.That(result, Is.InstanceOf<Google.Protobuf.WellKnownTypes.Empty>());
 
         // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null), Times.Once);
+        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null, null), Times.Once);
         _mockRepository.Verify(r => r.UpdateAsync(It.Is<Plant>(p =>
             p.Username == request.Username &&
             p.MAC == request.PlantMAC &&
@@ -191,7 +191,7 @@ public class PlantServiceTest
             TemperatureScale = TemperatureScale.C
         };
 
-        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null))
+        _mockRepository.Setup(r => r.GetPlantAsync(request.Username, request.PlantMAC, null, null))
             .ThrowsAsync(new InvalidOperationException("Plant not found"));
 
         // Act & Assert
@@ -199,13 +199,14 @@ public class PlantServiceTest
             await _plantService.Update(request, null));
 
         // Verify repository was called correctly
-        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null), Times.Once);
+        _mockRepository.Verify(r => r.GetPlantAsync(request.Username, request.PlantMAC, null, null), Times.Once);
     }
 
     // Get Happy Scenario (plant retrieved successfully)
     [Test]
     public async Task Get_ShouldReturnPlantResponse_WhenPlantExists()
     {
+        
         // Arrange
         var plant = new Plant
         {
@@ -214,15 +215,14 @@ public class PlantServiceTest
             Username = "testuser",
             Scale = (Entities.plant.TemperatureScale)TemperatureScale.C,
 
-            Temperatures = [],
-            AirHumidities = [],
-            SoilHumidities = [],
-            LightIntensities = []
+            SensorDatas = [],
+            Waterings = [],
+   
         };
 
         var repositoryMock = new Mock<IPlantRepository>();
         repositoryMock
-            .Setup(r => r.GetPlantAsync("testuser", "123456", It.IsAny<int?>()))
+            .Setup(r => r.GetPlantAsync("testuser", "123456", It.IsAny<int?>(),It.IsAny<int?>()))
             .ReturnsAsync(plant);
 
         var service = new PlantService(repositoryMock.Object);
@@ -250,7 +250,7 @@ public class PlantServiceTest
         var repositoryMock = new Mock<IPlantRepository>();
 
         repositoryMock
-            .Setup(r => r.GetPlantAsync("testuser", "missing", It.IsAny<int?>()))
+            .Setup(r => r.GetPlantAsync("testuser", "missing", It.IsAny<int?>(),It.IsAny<int?>() ))
             .ThrowsAsync(new InvalidOperationException("Plant not found"));
 
         var service = new PlantService(repositoryMock.Object);
