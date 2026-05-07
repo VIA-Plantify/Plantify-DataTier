@@ -9,7 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 
 RUN apt-get update && apt-get install -y git
 
-RUN git clone -b azure-trying-fix https://github.com/VIA-Plantify/Plantify-DataTier.git 
+RUN git clone -b main https://github.com/VIA-Plantify/Plantify-DataTier.git 
 
 WORKDIR /src
 COPY ["GrpcService/GrpcService.csproj", "GrpcService/"]
