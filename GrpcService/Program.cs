@@ -15,7 +15,13 @@ builder.Services.AddScoped<IPlantRepository, PlantRepository>();
 
 builder.Services.AddDbContext<PlantifyContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(10081, listenOptions =>
+    {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
