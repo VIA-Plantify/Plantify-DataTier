@@ -109,9 +109,6 @@ public static class ProtoUtils
             PlantMAC = watering.PlantMAC,
             LastWaterTime = Timestamp.FromDateTime(
                 DateTime.SpecifyKind(watering.LastWaterTime, DateTimeKind.Utc)
-            ),
-            PredictedFutureWaterTime = Timestamp.FromDateTime(
-                DateTime.SpecifyKind(watering.PredictedFutureWaterTime, DateTimeKind.Utc)
             )
         };
     }

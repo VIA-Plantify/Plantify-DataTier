@@ -24,4 +24,6 @@ public class Plant
     public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
     public ICollection<SensorData> SensorDatas { get; set; } = new List<SensorData>();
     
+    public DateTime AddedDate {get; set;} = DateTime.Now;
+    public bool ShouldPredictOptimal { get; set; } = false;
 }
