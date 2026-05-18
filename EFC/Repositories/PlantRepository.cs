@@ -62,6 +62,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
+                AddedDate = p.AddedDate,
+                ShouldPredictOptimal = p.ShouldPredictOptimal,
 
                 SensorDatas = p.SensorDatas
                     .OrderByDescending(s => s.Id)
@@ -119,6 +121,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
         existingPlant.OptimalAirHumidity = plant.OptimalAirHumidity;
         existingPlant.OptimalSoilHumidity = plant.OptimalSoilHumidity;
         existingPlant.OptimalLightIntensity = plant.OptimalLightIntensity;
+        existingPlant.ShouldPredictOptimal = plant.ShouldPredictOptimal;
 
         context.Plants.Update(existingPlant);
         await context.SaveChangesAsync();
@@ -144,7 +147,9 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
             OptimalAirHumidity = p.OptimalAirHumidity,
             OptimalSoilHumidity = p.OptimalSoilHumidity,
             OptimalLightIntensity = p.OptimalLightIntensity,
-
+            AddedDate = p.AddedDate,
+            ShouldPredictOptimal = p.ShouldPredictOptimal,
+            
             SensorDatas = p.SensorDatas
                 .OrderByDescending(s => s.Id)
                 .Take(take)

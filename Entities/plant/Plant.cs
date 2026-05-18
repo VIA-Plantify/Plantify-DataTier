@@ -19,11 +19,12 @@ public class Plant
     public double OptimalSoilHumidity { get; set; }
     public double OptimalLightIntensity { get; set; }
     
+    public DateTime AddedDate {get; set;} = DateTime.Now;
+    public bool ShouldPredictOptimal { get; set; } = false;
     
     //FOR EFC
     public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
     public ICollection<SensorData> SensorDatas { get; set; } = new List<SensorData>();
     
-    public DateTime AddedDate {get; set;} = DateTime.Now;
-    public bool ShouldPredictOptimal { get; set; } = false;
+
 }

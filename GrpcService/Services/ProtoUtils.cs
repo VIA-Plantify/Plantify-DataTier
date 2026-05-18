@@ -38,6 +38,9 @@ public static class ProtoUtils
         response.PlantMAC = entity.MAC;
         response.Name = entity.Name;
         response.TemperatureScale = (TemperatureScale)entity.Scale;
+        response.AddedDate = Timestamp.FromDateTime(
+            DateTime.SpecifyKind(entity.AddedDate, DateTimeKind.Utc));
+        response.ShouldPredictOptimal = entity.ShouldPredictOptimal;
 
         var latestSensor = sensorDatas
             .OrderByDescending(s => s.Id)
