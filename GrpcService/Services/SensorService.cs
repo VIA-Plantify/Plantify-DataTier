@@ -7,7 +7,7 @@ namespace GrpcService.Services;
 
 public class SensorService(ISensorRepository repository) : SensorServiceProto.SensorServiceProtoBase
 {
-    public async override Task<Empty> Create(CreateSensorDataRequest request, ServerCallContext context)
+    public override async Task<Empty> Create(CreateSensorDataRequest request, ServerCallContext context)
     {
         var sensor = new SensorData
         {
@@ -22,7 +22,7 @@ public class SensorService(ISensorRepository repository) : SensorServiceProto.Se
     return new Empty();
     }
 
-    public async override Task<SensorResponse?> GetLatest(GetLatestSensorDataRequest request, ServerCallContext context)
+    public override async Task<SensorResponse?> GetLatest(GetLatestSensorDataRequest request, ServerCallContext context)
     {
         return ProtoUtils.MapToSensorResponse(await repository.GetLatestAsync(request.PlantMac));
     }
