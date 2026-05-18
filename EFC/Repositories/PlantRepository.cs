@@ -122,7 +122,7 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
         existingPlant.OptimalSoilHumidity = plant.OptimalSoilHumidity;
         existingPlant.OptimalLightIntensity = plant.OptimalLightIntensity;
         existingPlant.ShouldPredictOptimal = plant.ShouldPredictOptimal;
-
+        existingPlant.Scale = plant.Scale;
         context.Plants.Update(existingPlant);
         await context.SaveChangesAsync();
     }
