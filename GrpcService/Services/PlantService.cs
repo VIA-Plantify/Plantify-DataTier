@@ -121,6 +121,8 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
         plant.OptimalLightIntensity = request.OptimalLightIntensity;
         plant.Scale = (Entities.plant.TemperatureScale)(int)request.TemperatureScale;
 
+        plant.ShouldPredictOptimal = request.ShouldPredictOptimal;
+
         await repository.UpdateAsync(plant);
         return new Empty();
     }
