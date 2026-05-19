@@ -28,12 +28,12 @@ public class WateringService (IWateringRepository repository) : WateringServiceP
     public override async Task<WateringResponse?> GetLatestWithPumpTime(GetLatestWateringDataRequest request, ServerCallContext context)
     {
         
-        var result = await repository.GetLastWithPumpTimeAsync(request.PlantMAC);
+         var result = await repository.GetLastWithPumpTimeAsync(request.PlantMAC);
         
-        if (result == null)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, $"No watering records with active pump time found."));
-        }
-        return ProtoUtils.MapToWateringResponse(result);
+         if (result == null)
+         {
+             throw new RpcException(new Status(StatusCode.NotFound, $"No watering records with active pump time found."));
+         }
+        return ProtoUtils.MapToWateringResponse(await repository.GetLastWithPumpTimeAsync(request.PlantMAC));
     }
 }

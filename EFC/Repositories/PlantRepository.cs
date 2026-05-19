@@ -164,6 +164,28 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
 
     public IQueryable<Plant> GetAllPlants()
     {
-        return context.Plants.Include(p => p.SensorDatas).Include(p => p.Waterings);
+        return context.Plants.Select(p => new Plant
+        {
+            MAC = p.MAC,
+            Username = p.Username,
+            Name = p.Name,
+            Scale = p.Scale,
+            OptimalTemperature = p.OptimalTemperature,
+            OptimalAirHumidity = p.OptimalAirHumidity,
+            OptimalSoilHumidity = p.OptimalSoilHumidity,
+            OptimalLightIntensity = p.OptimalLightIntensity,
+            AddedDate = p.AddedDate,
+            ShouldPredictOptimal = p.ShouldPredictOptimal,
+            
+            SensorDatas = p.SensorDatas
+                .OrderByDescending(s => s.Id)
+                .Take(1)
+                .ToList(),
+
+            Waterings = p.Waterings
+                .OrderByDescending(w => w.Id)
+                .Take(1)
+                .ToList()
+        });
     }
 }

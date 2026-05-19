@@ -38,8 +38,7 @@ public static class ProtoUtils
         response.PlantMAC = entity.MAC;
         response.Name = entity.Name;
         response.TemperatureScale = (TemperatureScale)entity.Scale;
-        response.AddedDate = Timestamp.FromDateTime(
-            DateTime.SpecifyKind(entity.AddedDate, DateTimeKind.Utc));
+        response.AddedDate = Timestamp.FromDateTime(entity.AddedDate.ToUniversalTime());
         response.ShouldPredictOptimal = entity.ShouldPredictOptimal;
 
         var latestSensor = sensorDatas
@@ -93,7 +92,7 @@ public static class ProtoUtils
             LightIntensity = sensor.LightIntensity,
             PlantMAC = sensor.PlantMAC,
             Timestamp = Timestamp.FromDateTime(
-                DateTime.SpecifyKind(sensor.Timestamp, DateTimeKind.Utc)
+                sensor.Timestamp.ToUniversalTime()
             )
         };
     }
@@ -111,7 +110,7 @@ public static class ProtoUtils
             WaterLevel = watering.WaterLevel,
             PlantMAC = watering.PlantMAC,
             LastWaterTime = Timestamp.FromDateTime(
-                DateTime.SpecifyKind(watering.LastWaterTime, DateTimeKind.Utc)
+                watering.LastWaterTime.ToUniversalTime()
             )
         };
     }
