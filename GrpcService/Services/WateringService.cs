@@ -25,4 +25,15 @@ public class WateringService (IWateringRepository repository) : WateringServiceP
     {
         return ProtoUtils.MapToWateringResponse(await repository.GetWateringAsync(request.PlantMAC));
     }
+    public override async Task<WateringResponse?> GetLatestWithPumpTime(GetLatestWateringDataRequest request, ServerCallContext context)
+    {
+        
+        var result = await repository.GetLastWithPumpTimeAsync(request.PlantMAC);
+        
+        if (result == null)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, $"No watering records with active pump time found."));
+        }
+        return ProtoUtils.MapToWateringResponse(result);
+    }
 }
