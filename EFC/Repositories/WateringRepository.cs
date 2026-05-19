@@ -18,4 +18,11 @@ public class WateringRepository(PlantifyContext context) : IWateringRepository
     {
         return await context.Waterings.OrderByDescending(w => w.Id).FirstOrDefaultAsync(w => w.PlantMAC == plantMac);
     }
+    public async Task<Watering?> GetLastWithPumpTimeAsync(string plantMac)
+    {
+        return await context.Waterings
+            .Where(w => w.PlantMAC == plantMac && w.PumpTimeInSeconds != 0)
+            .OrderByDescending(w => w.Id) 
+            .FirstOrDefaultAsync();
+    }
 }
