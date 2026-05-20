@@ -31,7 +31,31 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
             throw new InvalidOperationException($"Plant with MAC {plant.MAC} already exists.");
         }
 
-        context.Plants.Add(plant);
+        await context.Plants.AddAsync(plant);
+        
+        //making default first values
+        var sensor = new SensorData()
+        {
+            PlantMAC = plant.MAC,
+            AirHumidity = plant.OptimalAirHumidity,
+            LightIntensity = plant.OptimalLightIntensity,
+            SoilHumidity = plant.OptimalSoilHumidity,
+            Temperature = plant.OptimalTemperature,
+            Timestamp = DateTime.UtcNow
+        };
+        
+        var watering = new Watering()
+        {
+            PlantMAC = plant.MAC,
+            LastWaterTime = DateTime.UtcNow,
+            PumpTimeInSeconds = 1,
+            WaterLevel = 100
+        };
+        
+        await context.SensorDatas.AddAsync(sensor);
+        await context.Waterings.AddAsync(watering);
+        
+        
         await context.SaveChangesAsync();
         return plant;
     }
@@ -62,6 +86,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
                 OptimalAirHumidity = p.OptimalAirHumidity,
                 OptimalLightIntensity = p.OptimalLightIntensity,
                 OptimalSoilHumidity = p.OptimalSoilHumidity,
+                AddedDate = p.AddedDate,
+                ShouldPredictOptimal = p.ShouldPredictOptimal,
 
                 SensorDatas = p.SensorDatas
                     .OrderByDescending(s => s.Id)
@@ -119,7 +145,8 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
         existingPlant.OptimalAirHumidity = plant.OptimalAirHumidity;
         existingPlant.OptimalSoilHumidity = plant.OptimalSoilHumidity;
         existingPlant.OptimalLightIntensity = plant.OptimalLightIntensity;
-
+        existingPlant.ShouldPredictOptimal = plant.ShouldPredictOptimal;
+        existingPlant.Scale = plant.Scale;
         context.Plants.Update(existingPlant);
         await context.SaveChangesAsync();
     }
@@ -144,7 +171,9 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
             OptimalAirHumidity = p.OptimalAirHumidity,
             OptimalSoilHumidity = p.OptimalSoilHumidity,
             OptimalLightIntensity = p.OptimalLightIntensity,
-
+            AddedDate = p.AddedDate,
+            ShouldPredictOptimal = p.ShouldPredictOptimal,
+            
             SensorDatas = p.SensorDatas
                 .OrderByDescending(s => s.Id)
                 .Take(take)
@@ -159,6 +188,28 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
 
     public IQueryable<Plant> GetAllPlants()
     {
-        return context.Plants.Include(p => p.SensorDatas).Include(p => p.Waterings);
+        return context.Plants.Select(p => new Plant
+        {
+            MAC = p.MAC,
+            Username = p.Username,
+            Name = p.Name,
+            Scale = p.Scale,
+            OptimalTemperature = p.OptimalTemperature,
+            OptimalAirHumidity = p.OptimalAirHumidity,
+            OptimalSoilHumidity = p.OptimalSoilHumidity,
+            OptimalLightIntensity = p.OptimalLightIntensity,
+            AddedDate = p.AddedDate,
+            ShouldPredictOptimal = p.ShouldPredictOptimal,
+            
+            SensorDatas = p.SensorDatas
+                .OrderByDescending(s => s.Id)
+                .Take(1)
+                .ToList(),
+
+            Waterings = p.Waterings
+                .OrderByDescending(w => w.Id)
+                .Take(1)
+                .ToList()
+        });
     }
 }
