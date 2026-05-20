@@ -15,7 +15,7 @@ public class SensorService(ISensorRepository repository) : SensorServiceProto.Se
             Temperature = request.Temperature,
             LightIntensity = request.LightIntensity,
             AirHumidity = request.AirHumidity,
-            PlantMAC = request.PlantMAC,
+            PlantMAC = request.PlantMAC.ToLower(),
             Timestamp = request.Timestamp.ToDateTime()
         };
         await repository.CreateSensorData(sensor);
@@ -24,6 +24,6 @@ public class SensorService(ISensorRepository repository) : SensorServiceProto.Se
 
     public override async Task<SensorResponse?> GetLatest(GetLatestSensorDataRequest request, ServerCallContext context)
     {
-        return ProtoUtils.MapToSensorResponse(await repository.GetLatestAsync(request.PlantMac));
+        return ProtoUtils.MapToSensorResponse(await repository.GetLatestAsync(request.PlantMac.ToLower()));
     }
 }

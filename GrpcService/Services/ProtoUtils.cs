@@ -35,7 +35,7 @@ public static class ProtoUtils
 
         var response = MapToOptimalConfiguration(entity);
 
-        response.PlantMAC = entity.MAC;
+        response.PlantMAC = entity.MAC.ToLower();
         response.Name = entity.Name;
         response.TemperatureScale = (TemperatureScale)entity.Scale;
         response.AddedDate = Timestamp.FromDateTime(entity.AddedDate.ToUniversalTime());
@@ -90,7 +90,7 @@ public static class ProtoUtils
             AirHumidity = sensor.AirHumidity,
             SoilHumidity = sensor.SoilHumidity,
             LightIntensity = sensor.LightIntensity,
-            PlantMAC = sensor.PlantMAC,
+            PlantMAC = sensor.PlantMAC.ToLower(),
             Timestamp = Timestamp.FromDateTime(
                 sensor.Timestamp.ToUniversalTime()
             )
@@ -108,7 +108,7 @@ public static class ProtoUtils
             Id = watering.Id,
             PumpTimeInSeconds = watering.PumpTimeInSeconds,
             WaterLevel = watering.WaterLevel,
-            PlantMAC = watering.PlantMAC,
+            PlantMAC = watering.PlantMAC.ToLower(),
             LastWaterTime = Timestamp.FromDateTime(
                 watering.LastWaterTime.ToUniversalTime()
             )
