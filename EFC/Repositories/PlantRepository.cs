@@ -31,7 +31,31 @@ public class PlantRepository(PlantifyContext context) : IPlantRepository
             throw new InvalidOperationException($"Plant with MAC {plant.MAC} already exists.");
         }
 
-        context.Plants.Add(plant);
+        await context.Plants.AddAsync(plant);
+        
+        //making default first values
+        var sensor = new SensorData()
+        {
+            PlantMAC = plant.MAC,
+            AirHumidity = plant.OptimalAirHumidity,
+            LightIntensity = plant.OptimalLightIntensity,
+            SoilHumidity = plant.OptimalSoilHumidity,
+            Temperature = plant.OptimalTemperature,
+            Timestamp = DateTime.UtcNow
+        };
+        
+        var watering = new Watering()
+        {
+            PlantMAC = plant.MAC,
+            LastWaterTime = DateTime.UtcNow,
+            PumpTimeInSeconds = 1,
+            WaterLevel = 100
+        };
+        
+        await context.SensorDatas.AddAsync(sensor);
+        await context.Waterings.AddAsync(watering);
+        
+        
         await context.SaveChangesAsync();
         return plant;
     }
