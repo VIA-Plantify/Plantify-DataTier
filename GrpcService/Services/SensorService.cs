@@ -24,6 +24,7 @@ public class SensorService(ISensorRepository repository) : SensorServiceProto.Se
 
     public override async Task<SensorResponse?> GetLatest(GetLatestSensorDataRequest request, ServerCallContext context)
     {
+        
         return ProtoUtils.MapToSensorResponse(await repository.GetLatestAsync(request.PlantMac.ToLower()));
     }
 }
