@@ -10,7 +10,7 @@ public class SensorData
     public double AirHumidity { get; set; } = 0;
     public double SoilHumidity { get; set; } = 0;
     public double LightIntensity { get; set; } = 0;
-    public DateTime Timestamp { get; set; } = DateTime.Now;
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     
     //EFC
     public string PlantMAC { get; set; } = string.Empty;
