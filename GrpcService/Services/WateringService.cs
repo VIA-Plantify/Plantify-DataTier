@@ -14,7 +14,7 @@ public class WateringService (IWateringRepository repository) : WateringServiceP
             PumpTimeInSeconds = request.PumpTimeInSeconds,
             LastWaterTime = request.LastWaterTime.ToDateTime(),
             WaterLevel = request.WaterLevel,
-            PlantMAC = request.PlantMAC,
+            PlantMAC = request.PlantMAC.ToLower(),
         };
         
         await repository.CreateWatering(watering);
@@ -23,17 +23,17 @@ public class WateringService (IWateringRepository repository) : WateringServiceP
 
     public override async Task<WateringResponse?> GetLatest(GetLatestWateringDataRequest request, ServerCallContext context)
     {
-        return ProtoUtils.MapToWateringResponse(await repository.GetWateringAsync(request.PlantMAC));
+        return ProtoUtils.MapToWateringResponse(await repository.GetWateringAsync(request.PlantMAC.ToLower()));
     }
     public override async Task<WateringResponse?> GetLatestWithPumpTime(GetLatestWateringDataRequest request, ServerCallContext context)
     {
         
-         var result = await repository.GetLastWithPumpTimeAsync(request.PlantMAC);
+         var result = await repository.GetLastWithPumpTimeAsync(request.PlantMAC.ToLower());
         
          if (result == null)
          {
              throw new RpcException(new Status(StatusCode.NotFound, $"No watering records with active pump time found."));
          }
-        return ProtoUtils.MapToWateringResponse(await repository.GetLastWithPumpTimeAsync(request.PlantMAC));
+        return ProtoUtils.MapToWateringResponse(await repository.GetLastWithPumpTimeAsync(request.PlantMAC.ToLower()));
     }
 }

@@ -26,7 +26,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
         {
             Username = request.Username,
             Name = request.Name,
-            MAC = request.MAC,
+            MAC = request.MAC.ToLower(),
 
             OptimalTemperature = request.OptimalTemperature,
             OptimalAirHumidity = request.OptimalAirHumidity,
@@ -54,7 +54,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>A Task that completes when the deletion operation is finished. The return type is Empty, indicating no value is returned.</returns>
     public async override Task<Empty> Delete(DeletePlantRequest request, ServerCallContext context)
     {
-        await repository.DeleteAsync(request.Username, request.PlantMAC);
+        await repository.DeleteAsync(request.Username, request.PlantMAC.ToLower());
         return new Empty();
     }
 
@@ -68,7 +68,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     {
         try
         {
-            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC,
+            var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC.ToLower(),
                 request.NumberOfSensorReadings, request.NumberOfWateringReadings);
             return ProtoUtils.MapToPlantResponse(plant);
         }
@@ -106,7 +106,7 @@ public class PlantService(IPlantRepository repository) : PlantServiceProto.Plant
     /// <returns>An empty response indicating successful update.</returns>
     public async override Task<Empty> Update(UpdatePlantRequest request, ServerCallContext context)
     {
-        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC, numberOfSensorReadings: null,
+        var plant = await repository.GetPlantAsync(request.Username, request.PlantMAC.ToLower(), numberOfSensorReadings: null,
             numberOfWateringReadings: null);
 
         if (plant == null)
