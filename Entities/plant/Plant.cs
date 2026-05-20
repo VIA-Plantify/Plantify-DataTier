@@ -19,7 +19,7 @@ public class Plant
     public double OptimalSoilHumidity { get; set; }
     public double OptimalLightIntensity { get; set; }
     
-    public DateTime AddedDate {get; set;} = DateTime.Now;
+    public DateTime AddedDate {get; set;} = DateTime.UtcNow;
     public bool ShouldPredictOptimal { get; set; } = false;
     
     //FOR EFC
